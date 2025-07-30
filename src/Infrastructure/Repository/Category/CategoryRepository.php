@@ -7,18 +7,40 @@ use Src\Entity\Category\Category;
 use DateTime;
 
 final readonly class CategoryRepository extends PDOManager implements CategoryRepositoryInterface {
-    public function find(int $id): ?Category
+    public function find(int $id): ?Category //puede retornar un objeto Category o null
     {
-        $query = <<<HEREDOC
+        $query = <<<OBTENER_CATEGORIAS_POR_ID
                         SELECT 
                             *
                         FROM
-                            category C
+                            Category C
                         WHERE
                             C.id = :id
                         AND
                             C.deleted = 0
-                    HEREDOC;
+                    OBTENER_CATEGORIAS_POR_ID;
+
+        $parameters = [
+            "id" => $id,
+        ];
+
+        $result = $this->execute($query, $parameters);
+
+        return $this->toCategory($result[0] ?? null);
+    }
+
+    public function findDeleted(int $id): ?Category
+    {
+        $query = <<<OBTENER_CATEGORIAS_ELIMINADAS_POR_ID
+                        SELECT 
+                            *
+                        FROM
+                            Category C
+                        WHERE
+                            C.id = :id
+                        AND
+                            C.deleted = 1
+                    OBTENER_CATEGORIAS_ELIMINADAS_POR_ID;
 
         $parameters = [
             "id" => $id,
@@ -30,38 +52,118 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
     }
 
     /** @return Category[] */
-    public function search(): array
-    {
-        $query = <<<HEREDOC
+    public function search(): array{
+
+        $query = <<<OBTENER_CATEGORIAS
                         SELECT
                             *
                         FROM
-                            category C
+                            Category C
                         WHERE
                             C.deleted = 0
-                    HEREDOC;
+                    OBTENER_CATEGORIAS;
+        
+        $results = $this->execute($query);//Método heredado de PDOManager.Retorna un array asociativo con los resultados
+
+        $Category = [];
+        foreach($results as $result) { //Convierte cada resultado en un objeto Category
+            $Category[] = $this->toCategory($result);
+        }
+
+        return $Category;
+    }
+
+    /** @return Category[] */
+    public function searchDeleted(): array
+    {
+        $query = <<<OBTENER_CATEGORIAS_ELIMINADAS
+                        SELECT
+                            *
+                        FROM
+                            Category C
+                        WHERE
+                            C.deleted = 1
+                    OBTENER_CATEGORIAS_ELIMINADAS;
         
         $results = $this->execute($query);
 
-        $categories = [];
+        $Category = [];
         foreach($results as $result) {
-            $categories[] = $this->toCategory($result);
+            $Category[] = $this->toCategory($result);
         }
 
-        return $categories;
+        return $Category;
     }
-    public function insert(Category $category): void
-    {
-        $query = "INSERT INTO Category (name, deleted) VALUES (:name, :deleted) ";
 
-        $parameters = [
-            "name" => $category->name(),
-            "deleted" => $category->isDeleted()
+    //Agregar categorias
+    public function insert(Category $Category): void
+    {
+        $query = "INSERT INTO Category (name, description, creation_date, deleted) VALUES (:name, :description, :creation_date, :deleted)";
+
+        $parameters = [//se pasan los datos del objeto instanciado con getters
+            "name" => $Category->name(),
+            "description" => $Category->description(),
+            "creation_date" => $Category->creationDate()->format("Y-m-d H:i:s"),
+            "deleted" => $Category->isDeleted()
         ];
 
         $this->execute($query, $parameters);
     }
 
+    public function update(Category $Category): void
+    {
+        $query = <<<ACTUALIZAR_CATEGORIA
+                    UPDATE
+                        Category
+                    SET
+                        id = :id,
+                        name = :name,
+                        description = :description,
+                        deleted = :deleted
+                    WHERE
+                        id = :id
+                ACTUALIZAR_CATEGORIA;
+        
+        $parameters = [//se pasan los datos de Category con getters
+            "id" => $Category->id(),
+            "name" => $Category->name(),
+            "description" => $Category->description(),
+            "deleted" => $Category->isDeleted()
+        ];
+
+        $this->execute($query, $parameters);
+    }
+
+    public function delete(Category $Category): void
+    {
+        $query = <<<ELIMINAR_CATEGORIA
+                        DELETE FROM Category
+                        WHERE id = :id AND deleted = 1
+                    ELIMINAR_CATEGORIA;
+
+        $parameters = [
+            "id" => $Category->id()
+        ];
+
+        $this->execute($query, $parameters);
+    }
+
+    public function restore(Category $Category): void
+    {
+        $query = <<<RESTAURAR_CATEGORIA
+                        UPDATE Category
+                        SET deleted = 0
+                        WHERE id = :id AND deleted = 1
+                    RESTAURAR_CATEGORIA;
+
+        $parameters = [
+            "id" => $Category->id()
+        ];
+
+        $this->execute($query, $parameters);
+    }
+    
+    //Convierte arrays DB → Objetos Category
     private function toCategory(?array $primitive): ?Category {
         if ($primitive === null) {
             return null;
@@ -75,19 +177,4 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
             $primitive["deleted"]
         );
     }
-
-    // private function toCategory(?array $primitive): ?Category {
-    //     if (!is_array($primitive) || !array_key_exists("id", $primitive)) {
-    //         return null; // o lanzar una excepción si preferís ir más estricto
-    //     }
-
-    //     return new Category(
-    //         $primitive["id"],
-    //         $primitive["name"] ?? '',
-    //         $primitive["description"] ?? '',
-    //         new \DateTime($primitive["creation_date"] ?? 'now'),
-    //         (bool)($primitive["deleted"] ?? false)
-    //     );
-    // }
-
 }

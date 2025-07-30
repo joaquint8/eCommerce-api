@@ -20,11 +20,19 @@ final class Category {
         return new self(null, $name, $description, $creationDate, false);
     }
 
+    public function modify(string $name, string $description): void
+    {
+        $this->name = $name;
+        $this->description = $description;
+    }
+
+    // Cambia Estado 'DELETED'
     public function delete(): void
     {
         $this->deleted = true;
     }
 
+    // Consulta Estado 'DELETED'
     public function isDeleted(): int
     {
         return $this->deleted ? 1 : 0;

@@ -5,12 +5,22 @@ namespace Src\Infrastructure\Repository\Category;
 use Src\Entity\Category\Category;
 
 interface CategoryRepositoryInterface {
-    public function find(int $id): ?Category;
+    
+    public function insert(Category $category): void;
 
+    public function delete(Category $category): void;
+
+    public function update(Category $category): void;
+    
     /** @return Category[] */
     public function search(): array;
 
-    public function insert(Category $category): void;
+    /** @return Category[] */
+    public function searchDeleted(): array;
+    
+    public function find(int $id): ?Category;
 
-    //public function delete(Category $category): void;
+    public function findDeleted(int $id): ?Category;
+    
+    public function restore(Category $author): void;
 }
