@@ -16,7 +16,7 @@ final class Product {
         private int $stock,
         private ProductState $state,
         private DateTime $creationDate,
-        private int $categoryId,    
+        private int $categoryId,
         private bool $deleted,
         private ?string $imageUrl = null
         // Agregar un capo para fecha de edicion que al principio sea null y luego se le asigne la fecha actual al momento de modificar el producto

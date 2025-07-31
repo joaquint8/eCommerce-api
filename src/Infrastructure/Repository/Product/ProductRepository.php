@@ -106,7 +106,7 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
             "description" => $Product->description(),
             "price" => $Product->price(),
             "stock" => $Product->stock(),
-            "state" => $Product->state(),
+            "state" => $Product->state()->value,
             "creation_date" => $Product->creationDate()->format("Y-m-d H:i:s"),
             "categoryId" => $Product->categoryId(),
             "deleted" => $Product->isDeleted(),
@@ -122,16 +122,14 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
                     UPDATE
                         Product
                     SET
-                        id = :id,
                         name = :name,
                         description = :description,
                         price = :price,
                         stock = :stock,
                         state = :state,
-                        creation_date = :creation_date,
                         categoryId = :categoryId,
-                        deleted = :deleted
-                        imageUrl = :imageUrl,
+                        deleted = :deleted,
+                        imageUrl = :imageUrl
                     WHERE
                         id = :id
                 ACTUALIZAR_PRODUCTO;
@@ -142,8 +140,7 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
             "description" => $Product->description(),
             "price" => $Product->price(),
             "stock" => $Product->stock(),
-            "state" => $Product->state(),
-            "creation_date" => $Product->creationDate(),
+            "state" => $Product->state()->value,
             "categoryId" => $Product->categoryId(),
             "deleted" => $Product->isDeleted(),
             "imageUrl" => $Product->imageUrl()
