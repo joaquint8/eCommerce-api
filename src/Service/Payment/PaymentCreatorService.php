@@ -1,5 +1,7 @@
 <?php 
 
+namespace Src\Service\Payment;
+
 use Src\Infrastructure\Provider\Payment\MercadoPagoProvider;
 
 final readonly class PaymentCreatorService {
@@ -10,8 +12,13 @@ final readonly class PaymentCreatorService {
     }
 
     public function create(string $userId, array $items): string {
-        // Validar productos, stock, precios (puede usar repositorios)
-        // Armar preferencia
-        return $this->provider->generatePreference($items);
+        $payer = [
+            "name" => "Usuario",
+            "surname" => "Anonimo",
+            "email" => "usuario@example.com"
+        ];
+
+        $preference = $this->provider->generatePreference($items, $payer);
+        return $preference?->init_point ?? '';
     }
 }

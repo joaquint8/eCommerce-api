@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: mysql:3306
--- Tiempo de generación: 31-07-2025 a las 21:15:27
+-- Tiempo de generación: 06-08-2025 a las 03:41:38
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.28
 
@@ -20,6 +20,29 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `eCommerce`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Category`
+--
+
+CREATE TABLE `Category` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `creation_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `Category`
+--
+
+INSERT INTO `Category` (`id`, `name`, `description`, `creation_date`, `deleted`) VALUES
+(1, 'pantalonesEDITADO', 'pantalonesEDITADO', '2025-07-28 20:21:19', 0),
+(2, 'remeras', 'prenda de ropa remeras', '2025-07-28 20:21:19', 0),
+(5, 'ejemplo', 'ejemplo', '2025-07-31 15:15:47', 0);
 
 -- --------------------------------------------------------
 
@@ -56,6 +79,12 @@ INSERT INTO `Product` (`id`, `name`, `description`, `price`, `stock`, `state`, `
 --
 
 --
+-- Indices de la tabla `Category`
+--
+ALTER TABLE `Category`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `Product`
 --
 ALTER TABLE `Product`
@@ -67,10 +96,16 @@ ALTER TABLE `Product`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `Category`
+--
+ALTER TABLE `Category`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT de la tabla `Product`
 --
 ALTER TABLE `Product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

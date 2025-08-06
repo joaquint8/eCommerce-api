@@ -13,7 +13,10 @@ function startRouter(): Router
 
     include_once "Routes/ProductRoutes.php";
     $routes = array_merge($routes, ProductRoutes::getRoutes());
-    
+
+    include_once "Routes/PaymentRoutes.php";
+    $routes = array_merge($routes, PaymentRoutes::getRoutes());
+
     // Como las rutas en este momento son primitivas, tenemos que encapsularlas en un DTO
     $routesClass = [];
     foreach ($routes as $route) {
