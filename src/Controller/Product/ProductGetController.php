@@ -19,12 +19,10 @@ final readonly class ProductGetController {
             "name" => $product->name(),
             "description" => $product->description(),
             "price" => $product->price(),
-            "stock" => $product->stock(),
-            "state" => $product->state()->name,
-            "imageUrl" => $product->imageUrl(),
-            "creationDate" => $product->creationDate()->format('Y-m-d H:i:s'),
             "categoryId" => $product->categoryId(),
-            "deleted" => $product->isDeleted()
+            "deleted" => $product->isDeleted(),
+            "created_at" => $product->created_at()->format('Y-m-d H:i:s'),
+            "updated_at" => $product->updated_at()->format('Y-m-d H:i:s')
         ]);
     }
 }
