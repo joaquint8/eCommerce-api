@@ -172,8 +172,8 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
         return new Category(
             $primitive["id"],
             $primitive["name"],
-            $primitive["description"],
-            new DateTime($primitive["creation_date"]),
+            new DateTime($primitive["created_at"]),
+            new DateTime($primitive["updated_at"]),
             $primitive["deleted"]
         );
     }
