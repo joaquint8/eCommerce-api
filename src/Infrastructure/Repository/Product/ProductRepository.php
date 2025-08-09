@@ -188,12 +188,11 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
             $primitive["name"],
             $primitive["description"],
             $primitive["price"],
-            $primitive["stock"],
-            ProductState::tryFrom($primitive["state"]) ?? ProductState::ACTIVE,
-            new DateTime($primitive["creation_date"]),
             $primitive["categoryId"],
             $primitive["deleted"],
-            $primitive["imageUrl"]
+            new DateTime($primitive["created_at"]),
+            new DateTime($primitive["updated_at"]),
+            
         );
     }
 }

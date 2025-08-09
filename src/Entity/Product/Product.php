@@ -13,14 +13,10 @@ final class Product {
         private string $name,
         private string $description,
         private float $price,
-        private int $stock,
-        private ProductState $state,
-        private DateTime $creationDate,
         private int $categoryId,
         private bool $deleted,
-        private ?string $imageUrl = null
-        // Agregar un capo para fecha de edicion que al principio sea null y luego se le asigne la fecha actual al momento de modificar el producto
-        // private ?DateTime $modifiedDate = null
+        private DateTime $created_at,
+        private DateTime $updated_at
     ) {
     }
 
@@ -71,21 +67,15 @@ final class Product {
     {
         return $this->price;
     }
-    public function stock(): int
+  
+    public function created_at(): DateTime
     {
-        return $this->stock;
+        return $this->created_at;
     }
-    public function state(): ProductState
+
+    public function updated_at(): DateTime
     {
-        return $this->state;
-    }
-    public function imageUrl(): ?string
-    {
-        return $this->imageUrl;
-    }
-    public function creationDate(): DateTime
-    {
-        return $this->creationDate;
+        return $this->updated_at;
     }
 
     public function categoryId(): int
