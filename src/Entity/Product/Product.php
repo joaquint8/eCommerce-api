@@ -8,6 +8,9 @@ final class Product {
     /** @var ProductVariant[] */
     private array $variants; 
 
+    /** @var ProductVariant[] */
+    private array $images; 
+
     public function __construct(
         private ?int $id,
         private string $name,
@@ -17,9 +20,11 @@ final class Product {
         private bool $deleted,
         private DateTime $created_at,
         private DateTime $updated_at,
-        array $variants = []   
+        array $variants = [],
+        array $images = [] 
     ) {
         $this->variants = $variants;
+        $this->images = $images;
     }
 
     public static function create(
@@ -37,7 +42,8 @@ final class Product {
             false, // No eliminado al crear
             new DateTime(),
             new DateTime(),
-            []  // sin variantes al crear
+            [],  // sin variantes al crear
+            []  // sin imagenes al crear ??
         );
     }
 
@@ -62,11 +68,14 @@ final class Product {
     
     
     // === Getters ===
-    public function isDeleted(): bool {
-        return $this->deleted;
-    }
     public function getVariants(): array {
         return $this->variants;
+    }
+    public function getImages(): array {
+        return $this->images;
+    }
+    public function isDeleted(): bool {
+        return $this->deleted;
     }
     public function id(): ?int {
         return $this->id;

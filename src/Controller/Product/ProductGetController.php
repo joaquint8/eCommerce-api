@@ -31,7 +31,16 @@ final readonly class ProductGetController {
                     "stock" => $v->stock(),
                     "state" => $v->state(),
                 ];
-            }, $product->getVariants())
+            }, $product->getVariants()),
+
+            "images" => array_map(function ($images) { // a cada elemento del array y devolver un nuevo array con los resultados.transformar cada objeto images a un array asociativo
+                return [
+                    "id" => $images->id(),
+                    "image_url" => $images->image_url(),
+                    "created_at" => $images->created_at()->format('Y-m-d H:i:s'),
+                    "updated_at" => $images->updated_at()->format('Y-m-d H:i:s'),
+                ];
+            }, $product->getImages())
         ]);
     }
 }

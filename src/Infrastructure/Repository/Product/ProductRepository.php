@@ -6,6 +6,8 @@ use Src\Infrastructure\PDO\PDOManager;
 use Src\Entity\Product\Product;
 use Src\Entity\Product\ProductVariant;
 use Src\Entity\Product\ProductState;
+use Src\Entity\Product\ProductImages;
+
 use DateTime;
 
 final readonly class ProductRepository extends PDOManager implements ProductRepositoryInterface {
@@ -25,7 +27,12 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         $variantsQuery = "SELECT * FROM product_variants WHERE product_id = :productId AND deleted = 0";
         $variantsResult = $this->execute($variantsQuery, ['productId' => $id]);
 
+        // Traer imagenes
+        $imagesQuery = "SELECT * FROM Product_Images WHERE product_id = :productId AND deleted = 0";
+        $imagesResult = $this->execute($imagesQuery, ['productId' => $id]);
+
         $variants = [];
+        $images = [];
         foreach ($variantsResult as $v) {
             $variants[] = new ProductVariant(
                 $v['id'],
@@ -38,7 +45,18 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
             );
         }
 
-        return $this->toProduct($result[0], $variants);
+        foreach ($imagesResult as $image) {
+            $images[] = new ProductImages(
+                $image['id'],
+                $image['product_id'],
+                $image['image_url'],
+                new DateTime($image['created_at']),
+                new DateTime($image['updated_at']),
+                $image['deleted']
+            );
+        }
+
+        return $this->toProduct($result[0], $variants,$images);
     }
 
 
@@ -190,7 +208,7 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         $this->execute($query, $parameters);
     }
 
-    private function toProduct(?array $primitive, array $variants = []): ?Product 
+    private function toProduct(?array $primitive, array $variants = [],array $images = []): ?Product 
     {
         if ($primitive === null) {
             return null;
@@ -205,7 +223,8 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
             $primitive["deleted"],
             new DateTime($primitive["created_at"]),
             new DateTime($primitive["updated_at"]),
-            $variants  // parámetro para variantes
+            $variants, // parámetro para variantes
+            $images
         );
     }
 
