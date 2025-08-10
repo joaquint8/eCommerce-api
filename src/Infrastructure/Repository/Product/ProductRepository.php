@@ -4,31 +4,43 @@ namespace Src\Infrastructure\Repository\Product;
 
 use Src\Infrastructure\PDO\PDOManager;
 use Src\Entity\Product\Product;
+use Src\Entity\Product\ProductVariant;
 use Src\Entity\Product\ProductState;
 use DateTime;
 
 final readonly class ProductRepository extends PDOManager implements ProductRepositoryInterface {
-    public function find(int $id): ?Product
-    {
-        $query = <<<OBTENER_PRODUCTOS_POR_ID
-                        SELECT 
-                            *
-                        FROM
-                            Product P
-                        WHERE
-                            P.id = :id
-                        AND
-                            P.deleted = 0
-                    OBTENER_PRODUCTOS_POR_ID;
+    public function find(int $id): ?Product {
+        $query = <<<SQL
+            SELECT * FROM Product P WHERE P.id = :id AND P.deleted = 0
+        SQL;
 
-        $parameters = [
-            "id" => $id,
-        ];
-
+        $parameters = ["id" => $id];
         $result = $this->execute($query, $parameters);
 
-        return $this->toProduct($result[0] ?? null);
+        if (empty($result)) {
+            return null;
+        }
+
+        // Traer variantes
+        $variantsQuery = "SELECT * FROM product_variants WHERE product_id = :productId AND deleted = 0";
+        $variantsResult = $this->execute($variantsQuery, ['productId' => $id]);
+
+        $variants = [];
+        foreach ($variantsResult as $v) {
+            $variants[] = new ProductVariant(
+                $v['id'],
+                $v['product_id'],
+                $v['color'],
+                $v['size'],
+                $v['stock'],
+                ProductState::from($v['state']),
+                $v['deleted']
+            );
+        }
+
+        return $this->toProduct($result[0], $variants);
     }
+
 
     public function findDeleted(int $id): ?Product
     {
@@ -178,7 +190,8 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         $this->execute($query, $parameters);
     }
 
-    private function toProduct(?array $primitive): ?Product {
+    private function toProduct(?array $primitive, array $variants = []): ?Product 
+    {
         if ($primitive === null) {
             return null;
         }
@@ -192,7 +205,10 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
             $primitive["deleted"],
             new DateTime($primitive["created_at"]),
             new DateTime($primitive["updated_at"]),
-            
+            $variants  // parámetro para variantes
         );
     }
+
+    
 }
+
