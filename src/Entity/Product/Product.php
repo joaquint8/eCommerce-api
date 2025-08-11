@@ -64,6 +64,15 @@ final class Product {
         $this->updated_at = new DateTime();
     }
 
+    //setters para que el array no esté vacío en el ProductsGetController
+    public function setVariants(array $variants): void {
+        $this->variants = $variants;
+    }
+
+    public function setImages(array $images): void {
+        $this->images = $images;
+    }
+
     
     
     // === Getters ===

@@ -4,8 +4,33 @@ namespace Src\Infrastructure\Repository\ProductVariant;
 
 use Src\Infrastructure\PDO\PDOManager;
 use Src\Entity\Product\ProductVariant;
+use Src\Entity\Product\ProductState;
 
 final readonly class ProductVariantRepository extends PDOManager implements ProductVariantRepositoryInterface {
+
+    //que busque todas las variantes con ese product_id y devuelva un array de objetos
+    public function findByProductId(int $productId): array
+    {
+        $query = <<<SQL
+            SELECT *
+            FROM Product_Variants PV
+            WHERE PV.product_id = :product_id
+            AND PV.deleted = 0
+        SQL;
+
+        $parameters = [
+            "product_id" => $productId,
+        ];
+
+        $results = $this->execute($query, $parameters);
+
+        $variants = [];
+        foreach ($results as $row) {
+            $variants[] = $this->toProductVariant($row);
+        }
+
+        return $variants;
+    }
     
     public function insert(ProductVariant $ProductVariant): void
     {
@@ -35,7 +60,7 @@ final readonly class ProductVariantRepository extends PDOManager implements Prod
             $primitive["color"],
             $primitive["size"],
             $primitive["stock"],
-            $primitive["state"],
+            ProductState::from($primitive["state"]),
             $primitive["deleted"]
         );
     }

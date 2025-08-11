@@ -24,29 +24,24 @@ final readonly class ProductCreatorService {
 
     public function create(string $name, string $description, float $price, int $categoryId,array $variants = [], array $images = []): void
     {
-    //Utiliza el Create de Entity, luego Insert de Repository
+        //Utiliza el Create de Entity, luego Insert de Repository
         $Product = Product::create($name, $description, $price, $categoryId);
         //$productId = $Product->id(); no funciona porque todavia no se creó el objeto
 
-
-
         $productId = $this->repository->insert($Product);
 
-        //$Product->setId($productId);
+        //  Insertar variantes
+        foreach ($variants as $variant) {
+            $this->productVariantRepository->insert(
+                new ProductVariant(null, $productId, $variant['color'], $variant['size'], $variant['stock'], ProductState::from($variant['state']),false)
+            );
+        }
 
-
-    //  Insertar variantes
-    foreach ($variants as $variant) {
-        $this->productVariantRepository->insert(
-            new ProductVariant(null, $productId, $variant['color'], $variant['size'], $variant['stock'], ProductState::from($variant['state']),false)
-        );
-    }
-
-    // Insertar imágenes
-    foreach ($images as $image) {
-        $this->ProductImagesRepository->insert(
-            new ProductImages(null, $productId, $image['image_url'], new DateTime(), new DateTime(),false)
-        );
-    }
+        // Insertar imágenes
+        foreach ($images as $image) {
+            $this->ProductImagesRepository->insert(
+                new ProductImages(null, $productId, $image['image_url'], new DateTime(), new DateTime(),false)
+            );
+        }
     }
 }
