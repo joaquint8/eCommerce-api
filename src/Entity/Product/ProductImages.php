@@ -5,7 +5,7 @@ use DateTime;
 final class ProductImages
 {
     public function __construct(
-        private int $id,
+        private ?int $id,
         private int $productId,
         private string $image_url,
         private DateTime $created_at,
@@ -13,7 +13,6 @@ final class ProductImages
         private bool $deleted
     ) {}
 
-    // Getters
     public function id(): int {
         return $this->id;
     }
@@ -33,8 +32,9 @@ final class ProductImages
     public function updated_at(): DateTime {
         return $this->updated_at;
     }
-    public function isDeleted(): bool {
-        return $this->deleted;
+    public function isDeleted(): int
+    {
+        return $this->deleted ? 1 : 0;
     }
 
 }

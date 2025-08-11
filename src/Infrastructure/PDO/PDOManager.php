@@ -22,4 +22,8 @@ readonly class PDOManager {
 		$stmt->execute($parameters);
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}	
+
+	protected function lastInsertId(): string {
+        return $this->client->lastInsertId();
+    }
 }

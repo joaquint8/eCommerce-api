@@ -127,7 +127,7 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
     }
 
     //Agregar producto
-    public function insert(Product $Product): void
+    public function insert(Product $Product): int
     {
         $query = "INSERT INTO Product (name, description, price, categoryId, deleted, created_at, updated_at) VALUES (:name, :description, :price, :categoryId, :deleted, :created_at, :updated_at) ";
 
@@ -142,6 +142,9 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         ];
 
         $this->execute($query, $parameters);
+
+        // retorna el ID generado por la BD
+        return (int) $this->lastInsertId();
     }
 
     public function update(Product $Product): void

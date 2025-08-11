@@ -12,11 +12,16 @@ final readonly class ProductPostController {
 
     public function start(): void
     { 
+        //Tabla Product
         $name = ControllerUtils::getPost("name");
         $description = ControllerUtils::getPost("description");
         $price = ControllerUtils::getPost("price");
         $categoryId = ControllerUtils::getPost("categoryId");
+
+        //Tablas relacionadas (variantes e imagenes)
+        $variants = ControllerUtils::getPost("variants") ?? [];
+        $images = ControllerUtils::getPost("images") ?? [];
        
-        $this->service->create($name, $description, $price,$categoryId);
+        $this->service->create($name, $description, $price,$categoryId,$variants,$images);
     }
 }

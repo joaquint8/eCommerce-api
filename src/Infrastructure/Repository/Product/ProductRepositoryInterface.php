@@ -10,7 +10,7 @@ interface ProductRepositoryInterface {
     /** @return Product[] */
     public function search(): array;
 
-    public function insert(Product $product): void;
+    public function insert(Product $product): int;
 
     public function delete(Product $product): void;
 }

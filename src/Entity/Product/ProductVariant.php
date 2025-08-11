@@ -5,7 +5,7 @@ use Src\Entity\Product\ProductState;
 final class ProductVariant
 {
     public function __construct(
-        private int $id,
+        private ?int $id,
         private int $productId,
         private string $color,
         private string $size,
@@ -14,7 +14,6 @@ final class ProductVariant
         private bool $deleted
     ) {}
 
-    // Getters
     public function id(): int {
         return $this->id;
     }
@@ -35,8 +34,9 @@ final class ProductVariant
         return $this->stock;
     }
 
-    public function isDeleted(): bool {
-        return $this->deleted;
+    public function isDeleted(): int
+    {
+        return $this->deleted ? 1 : 0;
     }
 
     public function state(): ProductState {
