@@ -129,18 +129,16 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
     //Agregar producto
     public function insert(Product $Product): void
     {
-        $query = "INSERT INTO Product (name, description, price, stock, state, creation_date, categoryId, deleted, imageUrl) VALUES (:name, :description, :price, :stock, :state, :creation_date, :categoryId, :deleted, :imageUrl) ";
+        $query = "INSERT INTO Product (name, description, price, categoryId, deleted, created_at, updated_at) VALUES (:name, :description, :price, :categoryId, :deleted, :created_at, :updated_at) ";
 
         $parameters = [
             "name" => $Product->name(),
             "description" => $Product->description(),
             "price" => $Product->price(),
-            "stock" => $Product->stock(),
-            "state" => $Product->state()->value,
-            "creation_date" => $Product->creationDate()->format("Y-m-d H:i:s"),
             "categoryId" => $Product->categoryId(),
             "deleted" => $Product->isDeleted(),
-            "imageUrl" => $Product->imageUrl()
+            "created_at" => $Product->created_at()->format("Y-m-d H:i:s"),
+            "updated_at" => $Product->updated_at()->format("Y-m-d H:i:s")
         ];
 
         $this->execute($query, $parameters);

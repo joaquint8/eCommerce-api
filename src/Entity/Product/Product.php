@@ -26,7 +26,6 @@ final class Product {
         $this->variants = $variants;
         $this->images = $images;
     }
-
     public static function create(
         string $name,
         string $description,
@@ -74,8 +73,9 @@ final class Product {
     public function getImages(): array {
         return $this->images;
     }
-    public function isDeleted(): bool {
-        return $this->deleted;
+    public function isDeleted(): int
+    {
+        return $this->deleted ? 1 : 0;
     }
     public function id(): ?int {
         return $this->id;
