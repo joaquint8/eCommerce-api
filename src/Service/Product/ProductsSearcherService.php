@@ -6,28 +6,30 @@ namespace Src\Service\Product;
 use Src\Entity\Product\Product;
 use Src\Entity\Product\ProductImages;
 use Src\Entity\Product\ProductVariant;
+
+use Src\Service\Product\ProductsVariantsSearcherService;
+use Src\Service\Product\ProductsImagesSearcherService;
+
 use Src\Infrastructure\Repository\Product\ProductRepository;
-use Src\Infrastructure\Repository\ProductVariant\ProductVariantRepository;
-use Src\Infrastructure\Repository\ProductImages\ProductImagesRepository;
 
 final readonly class ProductsSearcherService {
-    private ProductRepository $repository; 
-    private ProductVariantRepository $productVariantRepository; 
-    private ProductImagesRepository $productImagesRepository; 
+    private ProductRepository $repository;
+    private ProductsVariantsSearcherService $productsVariantsSearcherService;
+    private ProductsImagesSearcherService $productsImagesSearcherService;
+
 
     public function __construct() {
         $this->repository = new ProductRepository();
-        $this->productVariantRepository = new ProductVariantRepository();
-        $this->productImagesRepository = new ProductImagesRepository();
+        $this->productsVariantsSearcherService = new ProductsVariantsSearcherService();
+        $this->productsImagesSearcherService = new ProductsImagesSearcherService();
     }
 
     /** @return Product[] **/ 
     public function search(): array
     {
         $products = $this->repository->search(); // 1 query para traer todos los productos
-        $variants = $this->productVariantRepository->search(); //1 query para traer todas las variantes
-        $images = $this->productImagesRepository->search();// 1 query para traer todas las imágenes
-
+        $variants = $this->productsVariantsSearcherService->search(); //1 query para traer todas las variantes
+        $images = $this->productsImagesSearcherService->search();// 1 query para traer todas las imágenes
 
         $images = $this->filterImages($images);
         $variants = $this->filterVariants($variants);
@@ -40,9 +42,7 @@ final readonly class ProductsSearcherService {
         return $products;
     }
 
-
-
-   //capaz que sea mejor hacer una funcion general. porque filterImages y filterVariants son iguales
+    //capaz que sea mejor hacer una funcion general. porque filterImages y filterVariants son iguales
     private function filterImages(array $images): array
     {
        /* // El array reduce hace lo mismo que este codigo
@@ -75,4 +75,6 @@ final readonly class ProductsSearcherService {
             []
         );
     }
+
+
 }
