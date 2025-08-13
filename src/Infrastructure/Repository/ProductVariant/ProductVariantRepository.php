@@ -5,6 +5,8 @@ namespace Src\Infrastructure\Repository\ProductVariant;
 use Src\Infrastructure\PDO\PDOManager;
 use Src\Entity\Product\ProductVariant;
 use Src\Entity\Product\ProductState;
+use Src\Entity\Product\ProductColor;
+use Src\Entity\Product\ProductSize;
 
 final readonly class ProductVariantRepository extends PDOManager implements ProductVariantRepositoryInterface {
 
@@ -59,8 +61,8 @@ final readonly class ProductVariantRepository extends PDOManager implements Prod
 
         $parameters = [
             "product_id" => $ProductVariant->productId(),
-            "color" => $ProductVariant->color(),
-            "size" => $ProductVariant->size(),
+            "color" => $ProductVariant->color()->value,
+            "size" => $ProductVariant->size()->value,
             "stock" => $ProductVariant->stock(),
             "state" => $ProductVariant->state()->value,
             "deleted" => $ProductVariant->isDeleted()
@@ -78,8 +80,8 @@ final readonly class ProductVariantRepository extends PDOManager implements Prod
         return new ProductVariant(
             $primitive["id"],
             $primitive["product_id"],
-            $primitive["color"],
-            $primitive["size"],
+            ProductColor::from($primitive["color"]),
+            ProductSize::from($primitive["size"]),
             $primitive["stock"],
             ProductState::from($primitive["state"]),
             $primitive["deleted"]

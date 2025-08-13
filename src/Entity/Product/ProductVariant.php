@@ -2,13 +2,15 @@
 
 namespace Src\Entity\Product;
 use Src\Entity\Product\ProductState;
+use Src\Entity\Product\ProductColor;
+use Src\Entity\Product\ProductSize;
 final class ProductVariant
 {
     public function __construct(
         private ?int $id,
         private int $productId,
-        private string $color,
-        private string $size,
+        private ProductColor $color,
+        private ProductSize $size,
         private int $stock,
         private ProductState $state,
         private bool $deleted
@@ -22,11 +24,11 @@ final class ProductVariant
         return $this->productId;
     }
 
-    public function color(): string {
+    public function color(): ProductColor {
         return $this->color;
     }
 
-    public function size(): string {
+    public function size(): ProductSize {
         return $this->size;
     }
 

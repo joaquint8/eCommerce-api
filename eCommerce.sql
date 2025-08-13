@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: mysql:3306
--- Tiempo de generación: 11-08-2025 a las 11:25:02
+-- Tiempo de generación: 13-08-2025 a las 23:51:39
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.29
 
@@ -58,13 +58,6 @@ CREATE TABLE `Orders` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Volcado de datos para la tabla `Orders`
---
-
-INSERT INTO `Orders` (`id`, `total`, `shipping_address`, `status`, `created_at`) VALUES
-(1, 100000, 'direccion de prueba 123', 'pending', '2025-08-10 23:46:34');
-
 -- --------------------------------------------------------
 
 --
@@ -81,14 +74,6 @@ CREATE TABLE `Order_Detail` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Volcado de datos para la tabla `Order_Detail`
---
-
-INSERT INTO `Order_Detail` (`id`, `order_id`, `product_id`, `quantity`, `unit_price`, `total_price`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 2, 25000, 50000, '2025-08-10 23:59:38', '2025-08-10 23:59:38'),
-(2, 1, 3, 1, 50000, 50000, '2025-08-11 00:00:39', '2025-08-11 00:00:39');
 
 -- --------------------------------------------------------
 
@@ -112,8 +97,7 @@ CREATE TABLE `Product` (
 --
 
 INSERT INTO `Product` (`id`, `name`, `description`, `price`, `categoryId`, `deleted`, `created_at`, `updated_at`) VALUES
-(2, 'Remera Levis', 'Remera oversize', 25000.00, 1, 0, '2025-08-09 19:29:17', '2025-08-10 18:21:39'),
-(3, 'Pantalon Levis', 'baggy', 50000.00, 2, 0, '2025-08-11 00:00:22', '2025-08-11 00:00:22');
+(5, 'remera 1', 'remera descripcion', 25000.00, 1, 0, '2025-08-13 23:44:32', '2025-08-13 23:44:32');
 
 -- --------------------------------------------------------
 
@@ -135,8 +119,8 @@ CREATE TABLE `Product_Images` (
 --
 
 INSERT INTO `Product_Images` (`id`, `product_id`, `image_url`, `created_at`, `updated_at`, `deleted`) VALUES
-(2, 2, 'https://tse4.mm.bing.net/th/id/OIP.YyDGMLI27R_TQ47sOk5KEwHaLH?r=0&rs=1&pid=ImgDetMain&o=7&rm=3', '2025-08-09 19:32:00', '2025-08-09 19:32:00', 0),
-(3, 2, 'https://tse4.mm.bing.net/th/id/OIP.g8RvSZ8aAYNV1ReswJbSvAAAAA?r=0&rs=1&pid=ImgDetMain&o=7&rm=3', '2025-08-09 19:32:44', '2025-08-09 19:32:44', 0);
+(1, 5, 'https://th.bing.com/th/id/R.3e807d05d20dae6cf6906fe67bb61e31?rik=tbVB%2fpMjmsyM7w&pid=ImgRaw&r=0', '2025-08-13 23:45:04', '2025-08-13 23:45:04', 0),
+(2, 5, 'https://levisarg.vtexassets.com/arquivos/ids/876650/1778332350_1.jpg?v=638687519133100000', '2025-08-13 23:45:22', '2025-08-13 23:45:22', 0);
 
 -- --------------------------------------------------------
 
@@ -147,8 +131,8 @@ INSERT INTO `Product_Images` (`id`, `product_id`, `image_url`, `created_at`, `up
 CREATE TABLE `Product_Variants` (
   `id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
-  `color` varchar(50) NOT NULL,
-  `size` varchar(10) NOT NULL,
+  `color` enum('Rojo','Azul','Blanco','Negro','Crema','Marron','Gris claro','Verde','Rosa','Celeste','Naranja','Violeta','Gris Oscuro','Bordo') NOT NULL,
+  `size` enum('XS','S','M','L','XL','XXL','36','38','40','42','44','46','48','50','52','54') NOT NULL,
   `stock` int(11) NOT NULL,
   `state` enum('active','inactive','out_of_stock','hidden') NOT NULL DEFAULT 'active',
   `deleted` tinyint(1) NOT NULL DEFAULT '0'
@@ -159,10 +143,8 @@ CREATE TABLE `Product_Variants` (
 --
 
 INSERT INTO `Product_Variants` (`id`, `product_id`, `color`, `size`, `stock`, `state`, `deleted`) VALUES
-(1, 2, 'Rojo', 'L', 10, 'active', 0),
-(2, 2, 'Rojo', 'XL', 15, 'active', 0),
-(3, 2, 'Negro', 'S', 12, 'active', 0),
-(4, 2, 'azul', 'S', 1, 'out_of_stock', 0);
+(1, 5, 'Crema', 'M', 10, 'active', 0),
+(2, 5, 'Blanco', 'S', 2, 'active', 0);
 
 -- --------------------------------------------------------
 
@@ -259,19 +241,19 @@ ALTER TABLE `Order_Detail`
 -- AUTO_INCREMENT de la tabla `Product`
 --
 ALTER TABLE `Product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `Product_Images`
 --
 ALTER TABLE `Product_Images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `Product_Variants`
 --
 ALTER TABLE `Product_Variants`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `User`
