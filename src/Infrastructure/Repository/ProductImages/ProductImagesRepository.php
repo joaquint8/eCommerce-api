@@ -68,6 +68,28 @@ final readonly class ProductImagesRepository extends PDOManager implements Produ
         $this->execute($query, $parameters);
     }
 
+    public function search(): array{
+
+        $query = <<<SQL
+                        SELECT
+                            *
+                        FROM
+                            Product_Images PI
+                        WHERE
+                            C.deleted = 0
+                    SQL;
+        
+        $results = $this->execute($query);
+
+        $ProductImages = [];
+        foreach($ProductImages as $ProductImage) { 
+            $ProductImages[] = $this->toProductImages($result);
+        }
+
+        return $Category;
+    }
+
+
     private function toProductImages(?array $primitive): ?ProductImages
     {
         if ($primitive === null) {

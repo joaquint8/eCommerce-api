@@ -22,6 +22,12 @@ final readonly class ProductFinderService {
             throw new ProductNotFoundException($id);
         }
 
+        $images = $this->productImagesSearcherByProductService->search($product->id());
+        $product->setImages($images);
+
+        $variants = $this->productVariantsSearcherByProductService->search($product->id());
+        $product->setVariants($variants);
+
         return $product;
     }
 }

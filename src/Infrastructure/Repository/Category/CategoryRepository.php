@@ -29,27 +29,7 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
         return $this->toCategory($result[0] ?? null);
     }
 
-    public function findDeleted(int $id): ?Category
-    {
-        $query = <<<OBTENER_CATEGORIAS_ELIMINADAS_POR_ID
-                        SELECT 
-                            *
-                        FROM
-                            Category C
-                        WHERE
-                            C.id = :id
-                        AND
-                            C.deleted = 1
-                    OBTENER_CATEGORIAS_ELIMINADAS_POR_ID;
-
-        $parameters = [
-            "id" => $id,
-        ];
-
-        $result = $this->execute($query, $parameters);
-
-        return $this->toCategory($result[0] ?? null);
-    }
+    
 
     /** @return Category[] */
     public function search(): array{

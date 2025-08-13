@@ -23,15 +23,34 @@ final readonly class ProductsSearcherService {
     public function search(): array
     {
         $products = $this->repository->search();
+        $variants = $this->productVariantRepository->search(); 
+        $images = $this->productImagesRepository->search();
 
-    foreach ($products as $product) {
-        $variants = $this->productVariantRepository->findByProductId($product->id()); 
-        $images = $this->productImagesRepository->findByProductId($product->id());
 
-        $product->setVariants($variants);
-        $product->setImages($images);
+        $images = $this->filterImages($images);
+
+        foreach ($products as $product) {
+            $product->setVariants($variants);
+            $product->setImages($images[$product->id()] ?? []);
+        }
+
+        return $products;
     }
 
-    return $products;
+    private function filterImages(array $images): array
+    {
+       /* // El array reduce hace lo mismo que este codigo
+        $salida = [];
+        foreach ($images as $image) {
+            $salida[$image->productId()][] = $image;
+        }
+
+        return $salida;
+        */
+        return array_reduce(
+            $images, 
+            fn ($items, ProductImage $image) => return $items[$image->productId()][] = $image;
+            []
+        );
     }
 }
