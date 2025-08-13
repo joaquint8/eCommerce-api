@@ -28,7 +28,7 @@ final readonly class ProductsSearcherService {
         $variants = $this->productVariantRepository->findByProductId($product->id()); 
         $images = $this->productImagesRepository->findByProductId($product->id());
 
-        $product->setVariants($variants);
+        $product->setVariants($variants); //para los gets del controller
         $product->setImages($images);
     }
 
