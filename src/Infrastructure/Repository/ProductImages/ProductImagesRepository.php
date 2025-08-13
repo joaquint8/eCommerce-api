@@ -12,9 +12,9 @@ final readonly class ProductImagesRepository extends PDOManager implements Produ
     {
         $query = <<<SQL
             SELECT *
-            FROM Product_Images I
-            WHERE I.product_id = :product_id
-            AND I.deleted = 0
+            FROM Product_Images PI
+            WHERE PI.product_id = :product_id
+            AND PI.deleted = 0
         SQL;
 
         $parameters = [
@@ -31,28 +31,27 @@ final readonly class ProductImagesRepository extends PDOManager implements Produ
         return $images;
     }
 
-    //nunca voy a querer hacer un find de imagenes por id. si no que por productId
-    // public function find(int $id): ?ProductImages
-    // {
-    //     $query = <<<OBTENER_IMAGENES_POR_ID
-    //                     SELECT 
-    //                         *
-    //                     FROM
-    //                         Product_Images I
-    //                     WHERE
-    //                         I.id = :id
-    //                     AND
-    //                         I.deleted = 0
-    //                 OBTENER_IMAGENES_POR_ID;
+    /** @return ProductImages[] */
+    public function search(): array
+    {
+        $query = <<<OBTENER_IMAGENES
+                        SELECT
+                            *
+                        FROM
+                            Product_Images PI
+                        WHERE
+                            PI.deleted = 0
+                    OBTENER_IMAGENES;
+        
+        $results = $this->execute($query);
 
-    //     $parameters = [
-    //         "id" => $id,
-    //     ];
+        $images = [];
+        foreach($results as $result) {
+            $images[] = $this->toProductImages($result);
+        }
 
-    //     $result = $this->execute($query, $parameters);
-
-    //     return $this->toProductImages($result[0] ?? null);
-    // }
+        return $images;
+    }
     
     public function insert(ProductImages $ProductImages): void
     {

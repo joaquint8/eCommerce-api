@@ -30,6 +30,28 @@ final readonly class ProductVariantRepository extends PDOManager implements Prod
 
         return $variants;
     }
+
+    /** @return ProductVariant[] */
+    public function search(): array
+    {
+        $query = <<<OBTENER_VARIANTES
+                        SELECT
+                            *
+                        FROM
+                            Product_Variants PV
+                        WHERE
+                            PV.deleted = 0
+                    OBTENER_VARIANTES;
+        
+        $results = $this->execute($query);
+
+        $variants = [];
+        foreach($results as $result) {
+            $variants[] = $this->toProductVariant($result);
+        }
+
+        return $variants;
+    }
     
     public function insert(ProductVariant $ProductVariant): void
     {
