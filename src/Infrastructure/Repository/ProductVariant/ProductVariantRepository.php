@@ -8,8 +8,7 @@ use Src\Entity\Product\ProductState;
 
 final readonly class ProductVariantRepository extends PDOManager implements ProductVariantRepositoryInterface {
 
-    //que busque todas las variantes con ese product_id y devuelva un array de objetos
-    public function findByProductId(int $productId): array
+    public function findVariantsByProductId(int $productId): array
     {
         $query = <<<SQL
             SELECT *

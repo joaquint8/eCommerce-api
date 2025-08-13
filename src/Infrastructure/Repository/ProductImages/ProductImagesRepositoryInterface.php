@@ -5,7 +5,7 @@ namespace Src\Infrastructure\Repository\ProductImages;
 use Src\Entity\Product\ProductImages;
 
 interface ProductImagesRepositoryInterface {
-    //public function find(int $id): ?ProductImages;
+    public function findImagesByProductId(int $id): ?array;
 
     /** @return ProductImages[] */
     //public function search(): array;

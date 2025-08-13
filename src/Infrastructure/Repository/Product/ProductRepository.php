@@ -23,64 +23,44 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
             return null;
         }
 
-        // Traer variantes
-        $variantsQuery = "SELECT * FROM product_variants WHERE product_id = :productId AND deleted = 0";
-        $variantsResult = $this->execute($variantsQuery, ['productId' => $id]);
+        // // Traer variantes
+        // $variantsQuery = "SELECT * FROM product_variants WHERE product_id = :productId AND deleted = 0";
+        // $variantsResult = $this->execute($variantsQuery, ['productId' => $id]);
 
-        // Traer imagenes
-        $imagesQuery = "SELECT * FROM Product_Images WHERE product_id = :productId AND deleted = 0";
-        $imagesResult = $this->execute($imagesQuery, ['productId' => $id]);
+        // // Traer imagenes
+        // $imagesQuery = "SELECT * FROM Product_Images WHERE product_id = :productId AND deleted = 0";
+        // $imagesResult = $this->execute($imagesQuery, ['productId' => $id]);
 
-        $variants = [];
-        $images = [];
-        foreach ($variantsResult as $v) {
-            $variants[] = new ProductVariant(
-                $v['id'],
-                $v['product_id'],
-                $v['color'],
-                $v['size'],
-                $v['stock'],
-                ProductState::from($v['state']),
-                $v['deleted']
-            );
-        }
+        // $variants = [];
+        // $images = [];
+        // foreach ($variantsResult as $v) {
+        //     $variants[] = new ProductVariant(
+        //         $v['id'],
+        //         $v['product_id'],
+        //         $v['color'],
+        //         $v['size'],
+        //         $v['stock'],
+        //         ProductState::from($v['state']),
+        //         $v['deleted']
+        //     );
+        // }
 
-        foreach ($imagesResult as $image) {
-            $images[] = new ProductImages(
-                $image['id'],
-                $image['product_id'],
-                $image['image_url'],
-                new DateTime($image['created_at']),
-                new DateTime($image['updated_at']),
-                $image['deleted']
-            );
-        }
-
-        return $this->toProduct($result[0], $variants,$images);
-    }
-
-
-    public function findDeleted(int $id): ?Product
-    {
-        $query = <<<OBTENER_PRODUCTOS_ELIMINADAS_POR_ID
-                        SELECT 
-                            *
-                        FROM
-                            Product P
-                        WHERE
-                            P.id = :id
-                        AND
-                            P.deleted = 1
-                    OBTENER_PRODUCTOS_ELIMINADAS_POR_ID;
-
-        $parameters = [
-            "id" => $id,
-        ];
-
-        $result = $this->execute($query, $parameters);
+        // foreach ($imagesResult as $image) {
+        //     $images[] = new ProductImages(
+        //         $image['id'],
+        //         $image['product_id'],
+        //         $image['image_url'],
+        //         new DateTime($image['created_at']),
+        //         new DateTime($image['updated_at']),
+        //         $image['deleted']
+        //     );
+        // }
 
         return $this->toProduct($result[0] ?? null);
     }
+
+
+    
 
     /** @return Product[] */
     public function search(): array
@@ -104,27 +84,7 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         return $products;
     }
 
-     /** @return Product[] */
-    public function searchDeleted(): array
-    {
-        $query = <<<OBTENER_PRODUCTOS_ELIMINADOS
-                        SELECT
-                            *
-                        FROM
-                            Product P
-                        WHERE
-                            P.deleted = 1
-                    OBTENER_PRODUCTOS_ELIMINADOS;
-        
-        $results = $this->execute($query);
-
-        $products = [];
-        foreach($results as $result) {
-            $products[] = $this->toProduct($result);
-        }
-
-        return $products;
-    }
+     
 
     //Agregar producto
     public function insert(Product $Product): int
@@ -147,69 +107,10 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         return (int) $this->lastInsertId();
     }
 
-    public function update(Product $Product): void
-    {
-        $query = <<<ACTUALIZAR_PRODUCTO
-                    UPDATE
-                        Product
-                    SET
-                        name = :name,
-                        description = :description,
-                        price = :price,
-                        stock = :stock,
-                        state = :state,
-                        categoryId = :categoryId,
-                        deleted = :deleted,
-                        imageUrl = :imageUrl
-                    WHERE
-                        id = :id
-                ACTUALIZAR_PRODUCTO;
-        
-        $parameters = [
-            "id" => $Product->id(),
-            "name" => $Product->name(),
-            "description" => $Product->description(),
-            "price" => $Product->price(),
-            "stock" => $Product->stock(),
-            "state" => $Product->state()->value,
-            "categoryId" => $Product->categoryId(),
-            "deleted" => $Product->isDeleted(),
-            "imageUrl" => $Product->imageUrl()
-        ];
+    
 
-        $this->execute($query, $parameters);
-    }
-
-    public function delete(Product $Product): void
-    {
-        $query = <<<ELIMINAR_PRODUCTO
-                        DELETE FROM Product
-                        WHERE id = :id AND deleted = 1
-                    ELIMINAR_PRODUCTO;
-
-        $parameters = [
-            "id" => $Product->id()
-        ];
-
-        $this->execute($query, $parameters);
-    }
-
-    public function restore(Product $Product): void
-    {
-        $query = <<<RESTAURAR_PRODUCTO
-                        UPDATE Product
-                        SET deleted = 0
-                        WHERE id = :id AND deleted = 1
-                    RESTAURAR_PRODUCTO;
-
-        $parameters = [
-            "id" => $Product->id()
-        ];
-
-        $this->execute($query, $parameters);
-    }
-
-    private function toProduct(?array $primitive, array $variants = [],array $images = []): ?Product 
+    
+    private function toProduct(?array $primitive): ?Product 
     {
         if ($primitive === null) {
             return null;
@@ -224,8 +125,8 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
             $primitive["deleted"],
             new DateTime($primitive["created_at"]),
             new DateTime($primitive["updated_at"]),
-            $variants, // parámetro para variantes
-            $images
+            //$variants,
+            //$images
         );
     }
 

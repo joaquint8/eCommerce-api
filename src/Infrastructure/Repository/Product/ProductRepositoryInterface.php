@@ -12,6 +12,6 @@ interface ProductRepositoryInterface {
 
     public function insert(Product $product): int;
 
-    public function delete(Product $product): void;
+    //public function delete(Product $product): void;
 }
 

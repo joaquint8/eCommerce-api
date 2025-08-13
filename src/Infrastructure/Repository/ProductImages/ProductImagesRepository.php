@@ -8,7 +8,7 @@ use DateTime;
 
 final readonly class ProductImagesRepository extends PDOManager implements ProductImagesRepositoryInterface {
 
-    public function findByProductId(int $productId): array
+    public function findImagesByProductId(int $productId): array
     {
         $query = <<<SQL
             SELECT *
@@ -31,27 +31,28 @@ final readonly class ProductImagesRepository extends PDOManager implements Produ
         return $images;
     }
 
-    public function find(int $id): ?ProductImages
-    {
-        $query = <<<OBTENER_IMAGENES_POR_ID
-                        SELECT 
-                            *
-                        FROM
-                            Product_Images I
-                        WHERE
-                            I.id = :id
-                        AND
-                            I.deleted = 0
-                    OBTENER_IMAGENES_POR_ID;
+    //nunca voy a querer hacer un find de imagenes por id. si no que por productId
+    // public function find(int $id): ?ProductImages
+    // {
+    //     $query = <<<OBTENER_IMAGENES_POR_ID
+    //                     SELECT 
+    //                         *
+    //                     FROM
+    //                         Product_Images I
+    //                     WHERE
+    //                         I.id = :id
+    //                     AND
+    //                         I.deleted = 0
+    //                 OBTENER_IMAGENES_POR_ID;
 
-        $parameters = [
-            "id" => $id,
-        ];
+    //     $parameters = [
+    //         "id" => $id,
+    //     ];
 
-        $result = $this->execute($query, $parameters);
+    //     $result = $this->execute($query, $parameters);
 
-        return $this->toProductImages($result[0] ?? null);
-    }
+    //     return $this->toProductImages($result[0] ?? null);
+    // }
     
     public function insert(ProductImages $ProductImages): void
     {
@@ -67,6 +68,9 @@ final readonly class ProductImagesRepository extends PDOManager implements Produ
 
         $this->execute($query, $parameters);
     }
+
+    
+
 
     private function toProductImages(?array $primitive): ?ProductImages
     {

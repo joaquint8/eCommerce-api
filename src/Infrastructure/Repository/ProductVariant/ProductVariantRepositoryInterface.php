@@ -5,7 +5,7 @@ namespace Src\Infrastructure\Repository\ProductVariant;
 use Src\Entity\Product\ProductVariant;
 
 interface ProductVariantRepositoryInterface {
-    //public function find(int $id): ?ProductVariant;
+    public function findVariantsByProductId(int $id): ?array;
 
     /** @return ProductVariant[] */
     //public function search(): array;
