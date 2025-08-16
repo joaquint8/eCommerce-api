@@ -53,28 +53,7 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
         return $Category;
     }
 
-    /** @return Category[] */
-    public function searchDeleted(): array
-    {
-        $query = <<<OBTENER_CATEGORIAS_ELIMINADAS
-                        SELECT
-                            *
-                        FROM
-                            Category C
-                        WHERE
-                            C.deleted = 1
-                    OBTENER_CATEGORIAS_ELIMINADAS;
-        
-        $results = $this->execute($query);
-
-        $Category = [];
-        foreach($results as $result) {
-            $Category[] = $this->toCategory($result);
-        }
-
-        return $Category;
-    }
-
+    
     //Agregar categorias
     public function insert(Category $Category): void
     {
@@ -128,20 +107,7 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
         $this->execute($query, $parameters);
     }
 
-    public function restore(Category $Category): void
-    {
-        $query = <<<RESTAURAR_CATEGORIA
-                        UPDATE Category
-                        SET deleted = 0
-                        WHERE id = :id AND deleted = 1
-                    RESTAURAR_CATEGORIA;
-
-        $parameters = [
-            "id" => $Category->id()
-        ];
-
-        $this->execute($query, $parameters);
-    }
+    
     
     //Convierte arrays DB → Objetos Category
     private function toCategory(?array $primitive): ?Category {

@@ -15,12 +15,7 @@ interface CategoryRepositoryInterface {
     /** @return Category[] */
     public function search(): array;
 
-    /** @return Category[] */
-    public function searchDeleted(): array;
-    
     public function find(int $id): ?Category;
 
-    public function findDeleted(int $id): ?Category;
-    
-    public function restore(Category $author): void;
+   
 }

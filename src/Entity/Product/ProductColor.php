@@ -9,12 +9,12 @@ enum ProductColor: string {
     case Negro = 'Negro';
     case Crema = 'Crema';
     case Marron = 'Marron';
-    case GrisClaro = 'Gris claro';
+    case GrisClaro = 'Gris-Claro';
     case Verde = 'Verde';
     case Rosa = 'Rosa';
     case Celeste = 'Celeste';
     case Naranja = 'Naranja';
     case Violeta = 'Violeta';
-    case GrisOscuro = 'Gris oscuro';
+    case GrisOscuro = 'Gris-Oscuro';
     case Bordo = 'Bordo';
 }
