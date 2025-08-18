@@ -4,9 +4,6 @@ namespace Src\Infrastructure\Repository\Product;
 
 use Src\Infrastructure\PDO\PDOManager;
 use Src\Entity\Product\Product;
-use Src\Entity\Product\ProductVariant;
-use Src\Entity\Product\ProductState;
-use Src\Entity\Product\ProductImages;
 
 use DateTime;
 
@@ -82,6 +79,34 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         }
 
         return $products;
+    }
+
+    public function update(Product $Product): void
+    {
+        $query = <<<ACTUALIZAR_PRODUCTO
+                    UPDATE
+                        Product
+                    SET
+                        id = :id,
+                        name = :name,
+                        description = :description,
+                        price = :price,
+                        categoryId = :categoryId,
+                        deleted = :deleted
+                    WHERE
+                        id = :id
+                ACTUALIZAR_PRODUCTO;
+        
+        $parameters = [//se pasan los datos de Category con getters
+            "id" => $Product->id(),
+            "name" => $Product->name(),
+            "description" => $Product->description(),
+            "price" => $Product->price(),
+            "categoryId" => $Product->categoryId(),
+            "deleted" => $Product->isDeleted()
+        ];
+
+        $this->execute($query, $parameters);
     }
 
      

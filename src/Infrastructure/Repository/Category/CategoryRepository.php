@@ -57,12 +57,11 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
     //Agregar categorias
     public function insert(Category $Category): void
     {
-        $query = "INSERT INTO Category (name, description, creation_date, deleted) VALUES (:name, :description, :creation_date, :deleted)";
+        $query = "INSERT INTO Category (name, creation_date, deleted) VALUES (:name, :created_at, :deleted)";
 
         $parameters = [//se pasan los datos del objeto instanciado con getters
             "name" => $Category->name(),
-            "description" => $Category->description(),
-            "creation_date" => $Category->creationDate()->format("Y-m-d H:i:s"),
+            "created_at" => $Category->created_at()->format("Y-m-d H:i:s"),
             "deleted" => $Category->isDeleted()
         ];
 
@@ -77,7 +76,6 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
                     SET
                         id = :id,
                         name = :name,
-                        description = :description,
                         deleted = :deleted
                     WHERE
                         id = :id
@@ -86,29 +84,12 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
         $parameters = [//se pasan los datos de Category con getters
             "id" => $Category->id(),
             "name" => $Category->name(),
-            "description" => $Category->description(),
             "deleted" => $Category->isDeleted()
         ];
 
         $this->execute($query, $parameters);
     }
 
-    public function delete(Category $Category): void
-    {
-        $query = <<<ELIMINAR_CATEGORIA
-                        DELETE FROM Category
-                        WHERE id = :id AND deleted = 1
-                    ELIMINAR_CATEGORIA;
-
-        $parameters = [
-            "id" => $Category->id()
-        ];
-
-        $this->execute($query, $parameters);
-    }
-
-    
-    
     //Convierte arrays DB → Objetos Category
     private function toCategory(?array $primitive): ?Category {
         if ($primitive === null) {

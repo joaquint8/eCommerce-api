@@ -20,10 +20,9 @@ final class Category {
         return new self(null, $name, $created_at,$updated_at, false);
     }
 
-    public function modify(string $name, string $description): void
+    public function modify(string $name): void
     {
         $this->name = $name;
-        $this->description = $description;
     }
 
     // Cambia Estado 'DELETED'

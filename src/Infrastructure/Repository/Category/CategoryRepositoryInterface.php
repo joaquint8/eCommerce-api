@@ -8,8 +8,6 @@ interface CategoryRepositoryInterface {
     
     public function insert(Category $category): void;
 
-    public function delete(Category $category): void;
-
     public function update(Category $category): void;
     
     /** @return Category[] */
