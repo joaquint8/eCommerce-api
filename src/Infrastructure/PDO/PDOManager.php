@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Src\Infrastructure\PDO;
 
@@ -13,13 +13,31 @@ readonly class PDOManager {
 		$this->client = $client->connect();
 	}
 
+	public function lastInsertId(): string {
+		return $this->client->lastInsertId();
+	}
+
 	public function execute(
 		string $query,
 		array $parameters = []
-	): array 
+	): array
 	{
 		$stmt = $this->client->prepare($query);
 		$stmt->execute($parameters);
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
-	}	
+	}
+
+	public function executeWithResult(string $query, array $params): bool {
+		$stmt = $this->client->prepare($query);
+		$stmt->execute($params);
+		return $stmt->rowCount() > 0;
+	}
+
+	public function fetchOne(string $query, array $parameters = []): ?array
+	{
+		$stmt = $this->client->prepare($query);
+		$stmt->execute($parameters);
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result ?: null;
+	}
 }

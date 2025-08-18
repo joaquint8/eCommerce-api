@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 include_once "Route.php";
 
@@ -11,7 +11,7 @@ final readonly class Router
     }
 
     /**
-     * Funcion principal que se encarga de la logica del Ruteador. 
+     * Funcion principal que se encarga de la logica del Ruteador.
      * Nos permite obtener la ruta a partir del URL, el metodo y los parametros enviados por el usuario.
      */
     public function resolve(string $url, string $method): void
@@ -48,15 +48,15 @@ final readonly class Router
 
             if (
                 // Determinamos si la URL a la que ingreso el usuario coincide con alguna de nuestras rutas
-                str_contains($url, $route->url()) && 
+                str_contains($url, $route->url()) &&
                 // Y si el metodo coincide con el de la ruta
-                $method === $route->method() && 
+                $method === $route->method() &&
                 // Y si los parametros ingresados por el usuario coinciden con los determinados en la ruta
                 $this->validateParameters($parameters, $route->parameters())
             ) {
                 return $route;
             }
-        }      
+        }
 
         // Si no encontramos ninguna ruta, devolvemos NULL
         return null;
@@ -74,7 +74,7 @@ final readonly class Router
         // Separamos el string sobrante en un array
         // Example /1/2 => [1,2]
         $params = explode('/', trim($param_str, '/'));
-        return array_filter($params);        
+        return array_filter($params);
     }
 
     /**
@@ -98,7 +98,7 @@ final readonly class Router
             if ($type === 'int' && (int) $urlParameters[$i] === 0) {
                 // Con esta linea le decimos a PHP que no siga recorriendo este bucle y se vaya al siguiente
                 continue;
-            } 
+            }
 
             // En el caso de que todo este OK, el parametro se considera como valido
             $validParams++;

@@ -52,6 +52,32 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         return $this->toProduct($result[0] ?? null);
     }
 
+    public function findImageUrlByProductId(int $productId): ?string {
+        $query = "SELECT image_url FROM Product_Images WHERE product_id = :productId LIMIT 1";
+        $result = $this->execute($query, ['productId' => $productId]);
+
+        return $result[0]['image_url'] ?? null;
+    }
+
+    public function findVariantsByProductId(int $productId): array {
+        // Consulta SQL para obtener variantes activas del producto
+        $query = "SELECT * FROM Product_Variants WHERE product_id = :productId AND deleted = 0";
+
+        // Ejecutamos la consulta usando el método heredado execute()
+        $rows = $this->execute($query, ['productId' => $productId]);
+
+        // Transformamos cada fila en una instancia de ProductVariant
+        return array_map(function ($row) {
+            return new ProductVariant(
+                (int) $row['id'],
+                $row['color'],
+                $row['size'],
+                (int) $row['stock'],
+                ProductState::tryFrom($row['state']) ?? ProductState::ACTIVE
+            );
+        }, $rows);
+    }
+
     /** @return Product[] */
     public function search(): array
     {
@@ -178,22 +204,23 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         $this->execute($query, $parameters);
     }
 
-    private function toProduct(?array $primitive): ?Product {
-        if ($primitive === null) {
-            return null;
+    public function toProduct(array $row): Product {
+        // Validación defensiva
+        if (!isset($row['id'], $row['name'], $row['description'], $row['price'], $row['categoryId'], $row['deleted'], $row['created_at'])) {
+            throw new \InvalidArgumentException('Faltan campos obligatorios en Product');
         }
 
         return new Product(
-            $primitive["id"],
-            $primitive["name"],
-            $primitive["description"],
-            $primitive["price"],
-            $primitive["stock"],
-            ProductState::tryFrom($primitive["state"]) ?? ProductState::ACTIVE,
-            new DateTime($primitive["creation_date"]),
-            $primitive["categoryId"],
-            $primitive["deleted"],
-            $primitive["imageUrl"]
+            (int) $row['id'],
+            $row['name'],
+            $row['description'],
+            (float) $row['price'],
+            0, // stock por defecto
+            ProductState::ACTIVE, // estado por defecto
+            new DateTime($row['created_at']),
+            (int) $row['categoryId'],
+            (int) $row['deleted'],
+            null // imageUrl opcional
         );
     }
 }

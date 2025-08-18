@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 final readonly class CategoryRoutes {
     public static function getRoutes(): array {

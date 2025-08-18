@@ -3,7 +3,7 @@
 include_once "Route.php";
 include_once "Router.php";
 
-function startRouter(): Router 
+function startRouter(): Router
 {
     // Inicializamos el array de rutas
     $routes = [];
