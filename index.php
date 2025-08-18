@@ -43,7 +43,8 @@ require_once __DIR__ . '/vendor/autoload.php';
                 "src/Service",
                 "src/Entity",
                 "src/Infrastructure",
-                "src/Utils"
+                "src/Utils",
+                "src/Middleware"
             ]);
         }
     );
