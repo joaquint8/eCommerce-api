@@ -1,8 +1,7 @@
-<?php 
+<?php
 
 use Src\Utils\ControllerUtils;
 use Src\Service\Product\ProductUpdaterService;
-use Src\Entity\Product\ProductState;
 
 final readonly class ProductPutController {
     private ProductUpdaterService $service;
@@ -11,22 +10,19 @@ final readonly class ProductPutController {
         $this->service = new ProductUpdaterService();
     }
 
-    public function start(int $id): void
-    {
-        $name = ControllerUtils::getPost("name");
-        $description = ControllerUtils::getPost("description");
-        $price = ControllerUtils::getPost("price");
-        $stock = ControllerUtils::getPost("stock");
-        $stateString = ControllerUtils::getPost("state");
-        $state = ProductState::tryFrom($stateString);
+    public function start(int $id): void {
+        $body = json_decode(file_get_contents("php://input"), true);
 
-        if (!$state) {
-            throw new InvalidArgumentException("Estado invalido de producto: $stateString");
-        }
-        $categoryId = ControllerUtils::getPost("categoryId");
-        $imageUrl = ControllerUtils::getPost("imageUrl");
+        $name = $body["name"];
+        $description = $body["description"];
+        $price = (float) $body["price"];
+        $categoryId = (int) $body["categoryId"];
+        $variants = $body["variants"] ?? [];
+        $images = $body["images"] ?? [];
 
 
-        $this->service->update($name, $description, $price, $stock, $state, $categoryId, $imageUrl, $id);
+        $updatedAt = new DateTime();
+
+        $this->service->update($id, $name, $description, $price, $categoryId, $updatedAt, $variants, $images);
     }
 }

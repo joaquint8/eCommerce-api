@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Src\Service\Category;
 
@@ -14,12 +14,12 @@ final readonly class CategoryUpdaterService {
         $this->finder = new CategoryFinderService();
     }
 
-    public function update(string $name, string $description, int $id): void
+    public function update(string $name, DateTime $updated_at, int $id): void
     {
         $Category = $this->finder->find($id);
 
-        $Category->modify($name, $description);
-        //Modify es un setter para todos 
+        $Category->modify($name, $updated_at);
+        //Modify es un setter para todos
         $this->repository->update($Category);
     }
 }

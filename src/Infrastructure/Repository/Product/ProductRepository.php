@@ -1,82 +1,62 @@
-<?php 
+<?php
 
 namespace Src\Infrastructure\Repository\Product;
 
 use Src\Infrastructure\PDO\PDOManager;
 use Src\Entity\Product\Product;
-use Src\Entity\Product\ProductState;
+
 use DateTime;
 
 final readonly class ProductRepository extends PDOManager implements ProductRepositoryInterface {
-    public function find(int $id): ?Product
-    {
-        $query = <<<OBTENER_PRODUCTOS_POR_ID
-                        SELECT 
-                            *
-                        FROM
-                            Product P
-                        WHERE
-                            P.id = :id
-                        AND
-                            P.deleted = 0
-                    OBTENER_PRODUCTOS_POR_ID;
+    public function find(int $id): ?Product {
+        $query = <<<OBTENER_PRODUCTO_POR_ID
+            SELECT * FROM Product P WHERE P.id = :id AND P.deleted = 0
+        OBTENER_PRODUCTO_POR_ID;
 
-        $parameters = [
-            "id" => $id,
-        ];
-
+        $parameters = ["id" => $id];
         $result = $this->execute($query, $parameters);
+
+        if (empty($result)) {
+            return null;
+        }
 
         return $this->toProduct($result[0] ?? null);
     }
 
-    public function findDeleted(int $id): ?Product
-    {
-        $query = <<<OBTENER_PRODUCTOS_ELIMINADAS_POR_ID
-                        SELECT 
-                            *
-                        FROM
-                            Product P
-                        WHERE
-                            P.id = :id
-                        AND
-                            P.deleted = 1
-                    OBTENER_PRODUCTOS_ELIMINADAS_POR_ID;
+    public function findDeleted(int $id): ?Product {
+        $query = <<<OBTENER_PRODUCTO_ELIMINADO_POR_ID
+            SELECT * FROM Product P WHERE P.id = :id AND P.deleted = 1
+        OBTENER_PRODUCTO_ELIMINADO_POR_ID;
 
-        $parameters = [
-            "id" => $id,
-        ];
-
+        $parameters = ["id" => $id];
         $result = $this->execute($query, $parameters);
+
+        if (empty($result)) {
+            return null;
+        }
 
         return $this->toProduct($result[0] ?? null);
     }
 
-    public function findImageUrlByProductId(int $productId): ?string {
-        $query = "SELECT image_url FROM Product_Images WHERE product_id = :productId LIMIT 1";
-        $result = $this->execute($query, ['productId' => $productId]);
+    public function insertAndReturnId(Product $product): int {
+        $query = "INSERT INTO Product (name, description, price, categoryId, deleted, created_at, updated_at)
+                VALUES (:name, :description, :price, :categoryId, :deleted, :created_at, :updated_at)";
 
-        return $result[0]['image_url'] ?? null;
+        $parameters = [
+            "name" => $product->name(),
+            "description" => $product->description(),
+            "price" => $product->price(),
+            "categoryId" => $product->categoryId(),
+            "deleted" => $product->isDeleted(),
+            "created_at" => $product->created_at()->format("Y-m-d H:i:s"),
+            "updated_at" => $product->updated_at()->format("Y-m-d H:i:s")
+        ];
+
+        $this->execute($query, $parameters);
+
+        return (int) $this->lastInsertId(); // método heredado de PDOManager
     }
 
-    public function findVariantsByProductId(int $productId): array {
-        // Consulta SQL para obtener variantes activas del producto
-        $query = "SELECT * FROM Product_Variants WHERE product_id = :productId AND deleted = 0";
-
-        // Ejecutamos la consulta usando el método heredado execute()
-        $rows = $this->execute($query, ['productId' => $productId]);
-
-        // Transformamos cada fila en una instancia de ProductVariant
-        return array_map(function ($row) {
-            return new ProductVariant(
-                (int) $row['id'],
-                $row['color'],
-                $row['size'],
-                (int) $row['stock'],
-                ProductState::tryFrom($row['state']) ?? ProductState::ACTIVE
-            );
-        }, $rows);
-    }
 
     /** @return Product[] */
     public function search(): array
@@ -100,7 +80,7 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         return $products;
     }
 
-     /** @return Product[] */
+    /** @return Product[] */
     public function searchDeleted(): array
     {
         $query = <<<OBTENER_PRODUCTOS_ELIMINADOS
@@ -111,7 +91,7 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
                         WHERE
                             P.deleted = 1
                     OBTENER_PRODUCTOS_ELIMINADOS;
-        
+
         $results = $this->execute($query);
 
         $products = [];
@@ -122,68 +102,31 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         return $products;
     }
 
-    //Agregar producto
-    public function insert(Product $Product): void
-    {
-        $query = "INSERT INTO Product (name, description, price, stock, state, creation_date, categoryId, deleted, imageUrl) VALUES (:name, :description, :price, :stock, :state, :creation_date, :categoryId, :deleted, :imageUrl) ";
-
-        $parameters = [
-            "name" => $Product->name(),
-            "description" => $Product->description(),
-            "price" => $Product->price(),
-            "stock" => $Product->stock(),
-            "state" => $Product->state()->value,
-            "creation_date" => $Product->creationDate()->format("Y-m-d H:i:s"),
-            "categoryId" => $Product->categoryId(),
-            "deleted" => $Product->isDeleted(),
-            "imageUrl" => $Product->imageUrl()
-        ];
-
-        $this->execute($query, $parameters);
-    }
-
     public function update(Product $Product): void
     {
         $query = <<<ACTUALIZAR_PRODUCTO
                     UPDATE
                         Product
                     SET
+                        id = :id,
                         name = :name,
                         description = :description,
                         price = :price,
-                        stock = :stock,
-                        state = :state,
                         categoryId = :categoryId,
                         deleted = :deleted,
-                        imageUrl = :imageUrl
+                        updated_at = :updated_at
                     WHERE
                         id = :id
                 ACTUALIZAR_PRODUCTO;
         
-        $parameters = [
+        $parameters = [//se pasan los datos de Category con getters
             "id" => $Product->id(),
             "name" => $Product->name(),
             "description" => $Product->description(),
             "price" => $Product->price(),
-            "stock" => $Product->stock(),
-            "state" => $Product->state()->value,
             "categoryId" => $Product->categoryId(),
             "deleted" => $Product->isDeleted(),
-            "imageUrl" => $Product->imageUrl()
-        ];
-
-        $this->execute($query, $parameters);
-    }
-
-    public function delete(Product $Product): void
-    {
-        $query = <<<ELIMINAR_PRODUCTO
-                        DELETE FROM Product
-                        WHERE id = :id AND deleted = 1
-                    ELIMINAR_PRODUCTO;
-
-        $parameters = [
-            "id" => $Product->id()
+            "updated_at" => $Product->updated_at()->format("Y-m-d H:i:s")
         ];
 
         $this->execute($query, $parameters);
@@ -191,11 +134,14 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
 
     public function restore(Product $Product): void
     {
-        $query = <<<RESTAURAR_PRODUCTO
-                        UPDATE Product
-                        SET deleted = 0
-                        WHERE id = :id AND deleted = 1
-                    RESTAURAR_PRODUCTO;
+        $query = <<<RESTORE_PRODUCTO
+                    UPDATE
+                        Product
+                    SET
+                        deleted = 0
+                    WHERE
+                        id = :id
+                RESTORE_PRODUCTO;
 
         $parameters = [
             "id" => $Product->id()
@@ -204,23 +150,77 @@ final readonly class ProductRepository extends PDOManager implements ProductRepo
         $this->execute($query, $parameters);
     }
 
-    public function toProduct(array $row): Product {
-        // Validación defensiva
-        if (!isset($row['id'], $row['name'], $row['description'], $row['price'], $row['categoryId'], $row['deleted'], $row['created_at'])) {
-            throw new \InvalidArgumentException('Faltan campos obligatorios en Product');
+    public function physicalDelete(Product $Product): void
+    {
+        $query = <<<ELIMINAR_PRODUCTO
+                    DELETE FROM
+                        Product
+                    WHERE
+                        id = :id AND deleted = 1
+                ELIMINAR_PRODUCTO;
+
+        $parameters = [
+            "id" => $Product->id()
+        ];
+
+        $this->execute($query, $parameters);
+    }
+
+    public function insert(Product $product): void {
+    $query = <<<SQL
+        INSERT INTO Product (name, description, price, categoryId, deleted, created_at, updated_at)
+        VALUES (:name, :description, :price, :categoryId, 0, NOW(), NOW())
+    SQL;
+
+    $parameters = [
+        "name" => $product->name(),
+        "description" => $product->description(),
+        "price" => $product->price(),
+        "categoryId" => $product->categoryId()
+    ];
+
+    $this->execute($query, $parameters);
+
+    // Obtener el ID generado
+    $productId = (int) $this->lastInsertId();
+    $product->setId($productId);
+
+    // Delegar persistencia de variantes
+    $variantRepo = new \Src\Infrastructure\Repository\ProductVariant\ProductVariantRepository();
+    foreach ($product->getVariants() as $variant) {
+        $variant->setProductId($productId);
+        $variantRepo->insert($variant);
+    }
+
+    // Delegar persistencia de imágenes
+    $imageRepo = new \Src\Infrastructure\Repository\ProductImages\ProductImagesRepository();
+    foreach ($product->getImages() as $image) {
+        $image->setProductId($productId);
+        $imageRepo->insert($image);
+    }
+}
+
+
+    private function toProduct(?array $primitive): ?Product 
+    {
+        if ($primitive === null) {
+            return null;
         }
 
         return new Product(
-            (int) $row['id'],
-            $row['name'],
-            $row['description'],
-            (float) $row['price'],
-            0, // stock por defecto
-            ProductState::ACTIVE, // estado por defecto
-            new DateTime($row['created_at']),
-            (int) $row['categoryId'],
-            (int) $row['deleted'],
-            null // imageUrl opcional
+            $primitive["id"],
+            $primitive["name"],
+            $primitive["description"],
+            $primitive["price"],
+            $primitive["categoryId"],
+            $primitive["deleted"],
+            new DateTime($primitive["created_at"]),
+            new DateTime($primitive["updated_at"]),
+            //$variants,
+            //$images
         );
     }
+
+    
 }
+

@@ -11,11 +11,11 @@ final readonly class CategoryPostController {
     }
 
     public function start(): void
-    { 
+    {
         $name = ControllerUtils::getPost("name");
-        $description = ControllerUtils::getPost("description");
-        $creationDate = ControllerUtils::getPost("creation_date");
+        $creationDate = new DateTime();
+        $updatedDate = new DateTime();
 
-        $this->service->create($name, $description, $creationDate);
+        $this->service->create($name, $creationDate, $updatedDate);
     }
 }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Src\Service\Category;
 
@@ -17,6 +17,6 @@ final readonly class CategoryPhysicalDeleterService {
     {
         $category = $this->finder->find($id);
 
-        $this->repository->delete($category);
-    } 
+        $this->repository->physicalDelete($category);
+    }
 }

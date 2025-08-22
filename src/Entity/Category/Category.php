@@ -9,21 +9,21 @@ final class Category {
     public function __construct(
         private readonly ?int $id,
         private string $name,
-        private string $description,
-        private DateTime $creationDate,
+        private DateTime $created_at,
+        private DateTime $updated_at,
         private bool $deleted
     ) {
     }
 
-    public static function create(string $name, string $description, DateTime $creationDate): self
+    public static function create(string $name, DateTime $created_at, DateTime $updated_at): self
     {
-        return new self(null, $name, $description, $creationDate, false);
+        return new self(null, $name, $created_at, $updated_at, false);
     }
 
-    public function modify(string $name, string $description): void
+    public function modify(string $name, DateTime $updated_at): void
     {
         $this->name = $name;
-        $this->description = $description;
+        $this->updated_at = $updated_at;
     }
 
     // Cambia Estado 'DELETED'
@@ -48,13 +48,13 @@ final class Category {
         return $this->name;
     }
 
-    public function description(): string
+    public function created_at(): DateTime
     {
-        return $this->description;
+        return $this->created_at;
     }
 
-    public function creationDate(): DateTime
+    public function updated_at(): DateTime
     {
-        return $this->creationDate;
+        return $this->updated_at;
     }
 }

@@ -14,12 +14,18 @@ final readonly class ProductRestoreService {
 
     public function restore(int $id): void
     {
-        $Product = $this->repository->findDeleted($id);
+        $product = $this->repository->findDeleted($id);
 
-        if (!$Product || !$Product->isDeleted()) {
-            throw new ProductNotFoundException($id,"El producto no esta en papelera para restaurar.");
+        if (!$product || !$product->isDeleted()) { //Si no encuentro la categoria (variable Product no existe), o si la categoria no está marcada como borrada (deleted = 0) lanzo una exepcion
+            throw new ProductNotFoundException($id,"La categoria no esta en papelera para restaurar.");
         }
 
-        $this->repository->restore($Product);
+        $this->repository->restore($product);
+
+        $variantRepo = new \Src\Infrastructure\Repository\ProductVariant\ProductVariantRepository();
+        $variantRepo->restoreByProductId($product->id());
+
+        $imageRepo = new \Src\Infrastructure\Repository\ProductImages\ProductImagesRepository();
+        $imageRepo->restoreByProductId($product->id());
     }
 }

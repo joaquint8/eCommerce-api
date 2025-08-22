@@ -1,7 +1,8 @@
-<?php 
+<?php
 
 namespace Src\Service\Category;
 
+use DateTime;
 use Src\Entity\Category\Category;
 use Src\Infrastructure\Repository\Category\CategoryRepository;
 
@@ -12,10 +13,10 @@ final readonly class CategoryCreatorService {
         $this->repository = new CategoryRepository();
     }
 
-    public function create(string $name, string $description, $creationDate): void
+    public function create(string $name, DateTime $creationDate, DateTime $updatedDate): void
     {
     //Utiliza el Create de Entity, luego Insert de Repository
-        $Category = Category::create($name, $description, $creationDate = new \DateTime());
+        $Category = Category::create($name, $creationDate, $updatedDate);
         $this->repository->insert($Category);
     }
 }

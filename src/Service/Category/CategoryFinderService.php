@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Src\Service\Category;
 
@@ -8,13 +8,13 @@ use Src\Entity\Category\Exception\CategoryNotFoundException;
 
 final readonly class CategoryFinderService {
 
-    private CategoryRepository $repository; 
+    private CategoryRepository $repository;
 
     public function __construct() {
         $this->repository = new CategoryRepository();
     }
 
-    public function find(int $id): Category {  
+    public function find(int $id): Category {
 
         $category = $this->repository->find($id);
 

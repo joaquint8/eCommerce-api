@@ -13,9 +13,8 @@ final readonly class CategoryPutController {
     public function start(int $id): void
     {
         $name = ControllerUtils::getPost("name");
-        $description = ControllerUtils::getPost("description");
+        $updated_at = new DateTime();
 
-
-        $this->service->update($name, $description, $id);
+        $this->service->update($name, $updated_at, $id);
     }
 }

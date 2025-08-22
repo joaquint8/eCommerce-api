@@ -14,12 +14,12 @@ final readonly class CategoryRestoreService {
 
     public function restore(int $id): void
     {
-        $Category = $this->repository->findDeleted($id);
+        $category = $this->repository->findDeleted($id);
 
-        if (!$Category || !$Category->isDeleted()) {
+        if (!$category || !$category->isDeleted()) { //Si no encuentro la categoria (variable category no existe), o si la categoria no está marcada como borrada (deleted = 0) lanzo una exepcion
             throw new CategoryNotFoundException($id,"La categoria no esta en papelera para restaurar.");
         }
 
-        $this->repository->restore($Category);
+        $this->repository->restore($category);
     }
 }

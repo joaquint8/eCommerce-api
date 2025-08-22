@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Src\Infrastructure\Repository\Category;
 
@@ -10,7 +10,7 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
     public function find(int $id): ?Category //puede retornar un objeto Category o null
     {
         $query = <<<OBTENER_CATEGORIAS_POR_ID
-                        SELECT 
+                        SELECT
                             *
                         FROM
                             Category C
@@ -29,10 +29,10 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
         return $this->toCategory($result[0] ?? null);
     }
 
-    public function findDeleted(int $id): ?Category
+    public function findDeleted(int $id): ?Category //puede retornar un objeto Category o null
     {
         $query = <<<OBTENER_CATEGORIAS_ELIMINADAS_POR_ID
-                        SELECT 
+                        SELECT
                             *
                         FROM
                             Category C
@@ -74,8 +74,8 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
     }
 
     /** @return Category[] */
-    public function searchDeleted(): array
-    {
+    public function searchDeleted(): array{
+
         $query = <<<OBTENER_CATEGORIAS_ELIMINADAS
                         SELECT
                             *
@@ -84,26 +84,26 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
                         WHERE
                             C.deleted = 1
                     OBTENER_CATEGORIAS_ELIMINADAS;
-        
-        $results = $this->execute($query);
+
+        $results = $this->execute($query);//Método heredado de PDOManager.Retorna un array asociativo con los resultados
 
         $Category = [];
-        foreach($results as $result) {
+        foreach($results as $result) { //Convierte cada resultado en un objeto Category
             $Category[] = $this->toCategory($result);
         }
 
         return $Category;
     }
-
+    
     //Agregar categorias
     public function insert(Category $Category): void
     {
-        $query = "INSERT INTO Category (name, description, creation_date, deleted) VALUES (:name, :description, :creation_date, :deleted)";
+        $query = "INSERT INTO Category (name, created_at, updated_at, deleted) VALUES (:name, :created_at, :updated_at, :deleted)";
 
         $parameters = [//se pasan los datos del objeto instanciado con getters
             "name" => $Category->name(),
-            "description" => $Category->description(),
-            "creation_date" => $Category->creationDate()->format("Y-m-d H:i:s"),
+            "created_at" => $Category->created_at()->format("Y-m-d H:i:s"),
+            "updated_at" => $Category->updated_at()->format("Y-m-d H:i:s"),
             "deleted" => $Category->isDeleted()
         ];
 
@@ -118,7 +118,7 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
                     SET
                         id = :id,
                         name = :name,
-                        description = :description,
+                        updated_at = :updated_at,
                         deleted = :deleted
                     WHERE
                         id = :id
@@ -127,22 +127,8 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
         $parameters = [//se pasan los datos de Category con getters
             "id" => $Category->id(),
             "name" => $Category->name(),
-            "description" => $Category->description(),
+            "updated_at" => $Category->updated_at()->format("Y-m-d H:i:s"),
             "deleted" => $Category->isDeleted()
-        ];
-
-        $this->execute($query, $parameters);
-    }
-
-    public function delete(Category $Category): void
-    {
-        $query = <<<ELIMINAR_CATEGORIA
-                        DELETE FROM Category
-                        WHERE id = :id AND deleted = 1
-                    ELIMINAR_CATEGORIA;
-
-        $parameters = [
-            "id" => $Category->id()
         ];
 
         $this->execute($query, $parameters);
@@ -150,11 +136,14 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
 
     public function restore(Category $Category): void
     {
-        $query = <<<RESTAURAR_CATEGORIA
-                        UPDATE Category
-                        SET deleted = 0
-                        WHERE id = :id AND deleted = 1
-                    RESTAURAR_CATEGORIA;
+        $query = <<<RESTORE_CATEGORIA
+                    UPDATE
+                        Category
+                    SET
+                        deleted = 0
+                    WHERE
+                        id = :id
+                RESTORE_CATEGORIA;
 
         $parameters = [
             "id" => $Category->id()
@@ -162,7 +151,23 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
 
         $this->execute($query, $parameters);
     }
-    
+
+    public function physicalDelete(Category $Category): void
+    {
+        $query = <<<ELIMINAR_CATEGORIA
+                    DELETE FROM
+                        Category
+                    WHERE
+                        id = :id AND deleted = 1
+                ELIMINAR_CATEGORIA;
+
+        $parameters = [
+            "id" => $Category->id()
+        ];
+
+        $this->execute($query, $parameters);
+    }
+
     //Convierte arrays DB → Objetos Category
     private function toCategory(?array $primitive): ?Category {
         if ($primitive === null) {
@@ -172,8 +177,8 @@ final readonly class CategoryRepository extends PDOManager implements CategoryRe
         return new Category(
             $primitive["id"],
             $primitive["name"],
-            $primitive["description"],
-            new DateTime($primitive["creation_date"]),
+            new DateTime($primitive["created_at"]),
+            new DateTime($primitive["updated_at"]),
             $primitive["deleted"]
         );
     }

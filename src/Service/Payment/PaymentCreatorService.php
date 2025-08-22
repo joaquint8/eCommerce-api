@@ -12,6 +12,7 @@ use Src\Infrastructure\Repository\Order\OrderRepository;
 // Importamos las entidades que representan la orden y sus ítems
 use Src\Entity\Order\Order;
 use Src\Entity\Order\OrderItem;
+use Src\Entity\Order\OrderState;
 
 // Para registrar la fecha de creación de la orden
 use DateTime;
@@ -53,13 +54,15 @@ final readonly class PaymentCreatorService {
             );
         }
 
+        
+
         // Creamos la entidad Order con todos los datos
         $order = new Order(
             (int) $userId,              // ID del usuario
             $externalReference,         // Referencia única para trazabilidad
             $total,                     // Monto total
             $shippingAddress,           // Dirección de envío
-            'pending',                  // Estado inicial de la orden
+            $status = OrderState::from('pending'),                  // Estado inicial de la orden
             new DateTime(),             // Fecha de creación
             $orderItems                 // Lista de ítems como objetos tipados
         );
@@ -69,17 +72,17 @@ final readonly class PaymentCreatorService {
 
         if ($orderExistente !== null) {
             // Si ya existe, evitamos duplicarla y generamos la preferencia sobre esa orden
-            error_log("Orden existente encontrada. Generando preferencia para OrderID {$orderExistente->getId()} con ExternalReference $externalReference");
+            error_log("Orden existente encontrada. Generando preferencia para OrderID {$orderExistente->id()} con ExternalReference $externalReference");
 
             return [
                 "preference" => $this->provider->generatePreference(
                     $items,                          // Ítems originales
                     $payer,                          // Datos del pagador
-                    (string) $orderExistente->getId(), // ID de la orden existente
+                    (string) $orderExistente->id(), // ID de la orden existente
                     (string) $userId,                // ID del usuario
                     $externalReference               // Referencia única
                 ),
-                "order_id" => $orderExistente->getId() // Retornamos el ID existente
+                "order_id" => $orderExistente->id() // Retornamos el ID existente
             ];
         }
 

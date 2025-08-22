@@ -17,8 +17,8 @@ final readonly class CategoryGetController {
         echo json_encode([ 
             "id" => $category->id(),
             "name" => $category->name(),
-            "description" => $category->description(),
-            "creationDate" => $category->creationDate()->format('Y-m-d H:i:s'),
+            "created_at" => $category->created_at()->format('Y-m-d H:i:s'),
+            "updated_at" => $category->updated_at()->format('Y-m-d H:i:s'),
             "deleted" => $category->isDeleted()
         ]);
     }

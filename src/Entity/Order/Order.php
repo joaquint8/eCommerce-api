@@ -1,5 +1,7 @@
-<?php
+<?php 
+
 namespace Src\Entity\Order;
+use Src\Entity\Order\OrderState;
 
 use DateTime;
 
@@ -7,23 +9,16 @@ use DateTime;
 // Contiene información del usuario, dirección, estado, fecha y los ítems comprados.
 
 final class Order {
-    private int $id;                        // ID interno de la orden (autogenerado en la base de datos)
-    private string $externalReference;     // Referencia única para vincular con Mercado Pago
-    private float $total;                  // Monto total de la orden
-    private string $shippingAddress;       // Dirección de envío
-    private string $status;                // Estado de la orden (pending, paid, etc.)
-    private DateTime $createdAt;           // Fecha de creación
-    /** @var OrderItem[] */
-    private array $items;                  // Lista de ítems comprados (instancias de OrderItem)
 
     public function __construct(
-        int $id,
-        string $externalReference,
-        float $total,
-        string $shippingAddress,
-        string $status,
-        DateTime $createdAt,
-        array $items // debe contener instancias de OrderItem
+        private readonly ?int $id,  // ID interno de la orden (autogenerado en la base de datos)
+        private string $externalReference, // Referencia única para vincular con Mercado Pago
+        private float $total, // Monto total de la orden
+        private string $shipping_address, // Dirección de envío
+        private OrderState $status, // Estado de la orden (pending, paid, etc.)
+        private DateTime $created_at, // Fecha de creación
+        /** @var OrderItem[] */
+        private array $items // Lista de ítems comprados (instancias de OrderItem)
     ) {
         // Validamos que todos los elementos del array sean instancias de OrderItem
         foreach ($items as $item) {
@@ -31,45 +26,48 @@ final class Order {
                 throw new \InvalidArgumentException("Todos los ítems deben ser instancias de OrderItem");
             }
         }
+    }
 
-        // Asignamos los valores a las propiedades privadas
-        $this->id = $id;
-        $this->externalReference = $externalReference;
-        $this->total = $total;
-        $this->shippingAddress = $shippingAddress;
-        $this->status = $status;
-        $this->createdAt = $createdAt;
-        $this->items = $items;
+    // funcion para crear una nueva orden
+    public static function create(string $externalReference, float $total,string $shipping_address, OrderState $status, DateTime $created_at, array $items): self
+    {
+        return new self(null, $externalReference, $total, $shipping_address, $status, $created_at, $items);
     }
 
     // Getters para acceder a los datos de la orden
-
-    public function getId(): int {
+    
+    public function id(): ?int
+    {
         return $this->id;
     }
 
-    public function externalReference(): string {
+    public function externalReference(): string
+    {
         return $this->externalReference;
     }
 
-    public function total(): float {
+    public function total(): float
+    {
         return $this->total;
     }
 
-    public function shippingAddress(): string {
-        return $this->shippingAddress;
+    public function shipping_address(): string
+    {
+        return $this->shipping_address;
     }
 
-    public function status(): string {
+    public function status(): OrderState
+    {
         return $this->status;
     }
 
-    public function createdAt(): DateTime {
-        return $this->createdAt;
+    public function created_at(): DateTime
+    {
+        return $this->created_at;
     }
 
-    /** @return OrderItem[] */
-    public function items(): array {
+    public function items(): array
+    {
         return $this->items;
     }
 }

@@ -12,12 +12,13 @@ use Src\Infrastructure\PDO\PDOManager;
 // Entidades que representan la orden y sus ítems
 use Src\Entity\Order\Order;
 use Src\Entity\Order\OrderItem;
+use Src\Entity\Order\OrderState;
 
 // Excepción lanzada si un producto no se encuentra al reconstruir una orden
 use Src\Exception\Product\ProductNotFoundException;
 
 // Repositorio que maneja la creación, consulta y actualización de órdenes en la base de datos
-final readonly class OrderRepository extends PDOManager {
+final readonly class OrderRepository extends PDOManager implements OrderRepositoryInterface {
     private ProductFinderService $productFinder;
 
     public function __construct()
@@ -28,36 +29,67 @@ final readonly class OrderRepository extends PDOManager {
     }
 
     // Crea una nueva orden en la base de datos y retorna su ID
-    public function create(Order $order): int
-    {
-        // Consulta SQL para insertar la orden principal
-        $query = <<<SQL
-            INSERT INTO Orders (external_reference, total, shipping_address, status, created_at)
-            VALUES (:external_reference, :total, :shipping_address, :status, :created_at)
-        SQL;
+    // public function create(Order $order): int
+    // {
+    //     // Consulta SQL para insertar la orden principal
+    //     $query = <<<SQL
+    //         INSERT INTO Orders (external_reference, total, shipping_address, status, created_at)
+    //         VALUES (:external_reference, :total, :shipping_address, :status, :created_at)
+    //     SQL;
 
-        // Parámetros extraídos de la entidad Order
+    //     // Parámetros extraídos de la entidad Order
+    //     $params = [
+    //         "external_reference" => $order->externalReference(),
+    //         "total" => $order->total(),
+    //         "shipping_address" => $order->shipping_address(),
+    //         "status" => $order->status(),
+    //         "created_at" => $order->created_at()->format("Y-m-d H:i:s")
+    //     ];
+
+    //     // Ejecutamos la inserción
+    //     $this->execute($query, $params);
+
+    //     // Obtenemos el ID autogenerado por la base de datos
+    //     $orderId = (int) $this->lastInsertId();
+
+    //     // Insertamos cada ítem de la orden en la tabla Order_Detail
+    //     foreach ($order->items() as $item) {
+    //         $this->insertDetail($orderId, $item);
+    //     }
+
+    //     return $orderId;
+    // }
+
+    public function create(Order $order): int {
+        $sql = "
+            INSERT INTO Orders (
+                external_reference,
+                total,
+                shipping_address,
+                status,
+                created_at
+            ) VALUES (
+                :external_reference,
+                :total,
+                :shipping_address,
+                :status,
+                :created_at
+            )
+        ";
+
         $params = [
-            "external_reference" => $order->externalReference(),
-            "total" => $order->total(),
-            "shipping_address" => $order->shippingAddress(),
-            "status" => $order->status(),
-            "created_at" => $order->createdAt()->format("Y-m-d H:i:s")
+            ':external_reference' => $order->externalReference(),
+            ':total' => $order->total(),
+            ':shipping_address' => $order->shipping_address(),
+            ':status' => $order->status()->value, // convierte enum a string
+            ':created_at' => $order->created_at()->format('Y-m-d H:i:s')
         ];
 
-        // Ejecutamos la inserción
-        $this->execute($query, $params);
+        $this->execute($sql, $params);
 
-        // Obtenemos el ID autogenerado por la base de datos
-        $orderId = (int) $this->lastInsertId();
-
-        // Insertamos cada ítem de la orden en la tabla Order_Detail
-        foreach ($order->items() as $item) {
-            $this->insertDetail($orderId, $item);
-        }
-
-        return $orderId;
+        return (int)$this->lastInsertId();
     }
+
 
     // Inserta un ítem de la orden en la tabla Order_Detail
     private function insertDetail(int $orderId, OrderItem $item): void
@@ -121,7 +153,43 @@ final readonly class OrderRepository extends PDOManager {
         return false;
     }
 
-    // Reconstruye una entidad Order a partir de los datos crudos de la base de datos
+    public function find(int $id): ?Order {
+        $query = <<<SQL
+            SELECT *
+            FROM Orders O
+            WHERE O.id = :id
+        SQL;
+
+        $parameters = [
+            "id" => $id,
+        ];
+
+        $result = $this->execute($query, $parameters);
+
+        return $this->toOrder($result[0] ?? null);
+    }
+    
+    /** @return Order[] */
+    public function search(): array{
+        
+        $query = <<<OBTENER_PEDIDOS
+        SELECT
+        *
+        FROM
+        Orders O
+        
+        OBTENER_PEDIDOS;
+        
+        $results = $this->execute($query);//Método heredado de PDOManager.Retorna un array asociativo con los resultados
+        
+        $Order = [];
+        foreach($results as $result) { //Convierte cada resultado en un objeto Order
+            $Order[] = $this->toOrder($result);
+        }
+        
+        return $Order;
+    }
+    
     private function toOrder(array $raw): Order
     {
         // Consultamos los ítems asociados a la orden
@@ -154,8 +222,8 @@ final readonly class OrderRepository extends PDOManager {
             (int) $raw["id"],
             $raw["external_reference"],
             (float) $raw["total"],
-            $raw["status"],
             $raw["shipping_address"],
+            OrderState::from($raw["status"]),
             new \DateTime($raw["created_at"]),
             $orderItems
         );

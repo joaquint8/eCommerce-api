@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Src\Service\Product;
 
@@ -15,8 +15,16 @@ final readonly class ProductPhysicalDeleterService {
 
     public function delete(int $id): void
     {
-        $Product = $this->finder->find($id);
+        $product = $this->finder->find($id);
 
-        $this->repository->delete($Product);
-    } 
+        $this->repository->physicalDelete($product);
+    
+        $variantRepo = new \Src\Infrastructure\Repository\ProductVariant\ProductVariantRepository();
+        $variantRepo->physicalDeleteByProductId($product->id());
+
+        $imageRepo = new \Src\Infrastructure\Repository\ProductImages\ProductImagesRepository();
+        $imageRepo->physicalDeleteByProductId($product->id());
+
+        $this->repository->physicalDelete($product);
+    }
 }

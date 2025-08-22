@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Src\Service\Category;
 
@@ -20,5 +20,5 @@ final readonly class CategoryDeleterService {
         $Category->delete();
         //Utiliza el Borrado Logico de la Entidad
         $this->repository->update($Category);
-    } 
+    }
 }

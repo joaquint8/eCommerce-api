@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Src\Service\Product;
 
@@ -14,14 +14,14 @@ final readonly class ProductDeletedFinderService {
         $this->repository = new ProductRepository();
     }
 
-    public function find(int $id): Product 
-    {   
-        $Product = $this->repository->findDeleted($id);
+    public function find(int $id): Product
+    {
+        $product = $this->repository->findDeleted($id);
 
-        if ($Product === null) {
+        if ($product === null) {
             throw new ProductNotFoundException($id, "No existe ningun producto eliminado con ese Id.");
         }
 
-        return $Product;
+        return $product;
     }
 }

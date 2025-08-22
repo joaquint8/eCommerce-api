@@ -1,35 +1,28 @@
-<?php 
+<?php
 
-use Src\Service\Product\ProductsDeletedSearcherService;
-
+use Src\Service\Product\ProductsSearcherDeletedService;
 final readonly class ProductsDeletedGetController {
-    private ProductsDeletedSearcherService $service;
+    private ProductsSearcherDeletedService $service;
 
     public function __construct() {
-        $this->service = new ProductsDeletedSearcherService();
+        $this->service = new ProductsSearcherDeletedService();
     }
 
-    public function start(): void
-    {
-        $Products = $this->service->search();
-        echo json_encode($this->toResponse($Products));
+    public function start(): void{
+        $products = $this->service->search();
+
+        echo json_encode($this->toResponse($products));
     }
 
-    private function toResponse(array $Products): array 
-    {
+    private function toResponse(array $products): array{
         $responses = [];
-        
-        foreach($Products as $product) {
+
+        foreach($products as $product) {
             $responses[] = [
                 "id" => $product->id(),
                 "name" => $product->name(),
-                "description" => $product->description(),
-                "price" => $product->price(),
-                "stock" => $product->stock(),
-                "state" => $product->state()->name,
-                "imageUrl" => $product->imageUrl(),
-                "creationDate" => $product->creationDate()->format('Y-m-d H:i:s'),
-                "categoryId" => $product->categoryId(),
+                "created_at" => $product->created_at()->format('Y-m-d H:i:s'),
+                "updated_at" => $product->updated_at()->format('Y-m-d H:i:s'),
                 "deleted" => $product->isDeleted()
             ];
         }

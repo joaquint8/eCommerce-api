@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use Src\Service\Category\CategoryDeleterService;
 

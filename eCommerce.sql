@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: mysql:3306
--- Tiempo de generación: 09-08-2025 a las 16:57:42
+-- Tiempo de generación: 13-08-2025 a las 23:51:39
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.29
 
@@ -31,8 +31,18 @@ CREATE TABLE `Category` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `Category`
+--
+
+INSERT INTO `Category` (`id`, `name`, `created_at`, `updated_at`, `deleted`) VALUES
+(1, 'Remeras', '2025-08-09 19:13:24', '2025-08-09 19:13:24', 0),
+(2, 'Pantalones', '2025-08-09 19:13:36', '2025-08-09 19:13:36', 0),
+(3, 'nueva categoria', '2025-08-10 21:41:12', '2025-08-10 21:41:12', 0);
 
 -- --------------------------------------------------------
 
@@ -44,10 +54,8 @@ CREATE TABLE `Orders` (
   `id` int(11) NOT NULL,
   `total` decimal(10,0) NOT NULL,
   `shipping_address` text NOT NULL,
-  `status` enum('pending','shipped','delivered','cancelled') NOT NULL DEFAULT 'pending',
-  `order_date` datetime DEFAULT CURRENT_TIMESTAMP,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `status` enum('pending','shipped','cancelled') NOT NULL DEFAULT 'pending',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -61,7 +69,8 @@ CREATE TABLE `Order_Detail` (
   `order_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
-  `price` decimal(10,0) NOT NULL,
+  `unit_price` decimal(10,0) NOT NULL,
+  `total_price` decimal(10,0) NOT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -76,16 +85,19 @@ CREATE TABLE `Product` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text NOT NULL,
-  `color` varchar(255) NOT NULL,
-  `size` varchar(255) NOT NULL,
   `price` decimal(10,2) NOT NULL,
-  `stock` int(11) NOT NULL DEFAULT '0',
-  `state` enum('active','inactive','out_of_stock','hidden') NOT NULL DEFAULT 'active',
   `categoryId` int(11) NOT NULL,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `Product`
+--
+
+INSERT INTO `Product` (`id`, `name`, `description`, `price`, `categoryId`, `deleted`, `created_at`, `updated_at`) VALUES
+(5, 'remera 1', 'remera descripcion', 25000.00, 1, 0, '2025-08-13 23:44:32', '2025-08-13 23:44:32');
 
 -- --------------------------------------------------------
 
@@ -98,8 +110,41 @@ CREATE TABLE `Product_Images` (
   `product_id` int(11) NOT NULL,
   `image_url` varchar(255) NOT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `Product_Images`
+--
+
+INSERT INTO `Product_Images` (`id`, `product_id`, `image_url`, `created_at`, `updated_at`, `deleted`) VALUES
+(1, 5, 'https://th.bing.com/th/id/R.3e807d05d20dae6cf6906fe67bb61e31?rik=tbVB%2fpMjmsyM7w&pid=ImgRaw&r=0', '2025-08-13 23:45:04', '2025-08-13 23:45:04', 0),
+(2, 5, 'https://levisarg.vtexassets.com/arquivos/ids/876650/1778332350_1.jpg?v=638687519133100000', '2025-08-13 23:45:22', '2025-08-13 23:45:22', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Product_Variants`
+--
+
+CREATE TABLE `Product_Variants` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `color` enum('Rojo','Azul','Blanco','Negro','Crema','Marron','Gris claro','Verde','Rosa','Celeste','Naranja','Violeta','Gris Oscuro','Bordo') NOT NULL,
+  `size` enum('XS','S','M','L','XL','XXL','36','38','40','42','44','46','48','50','52','54') NOT NULL,
+  `stock` int(11) NOT NULL,
+  `state` enum('active','inactive','out_of_stock','hidden') NOT NULL DEFAULT 'active',
+  `deleted` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `Product_Variants`
+--
+
+INSERT INTO `Product_Variants` (`id`, `product_id`, `color`, `size`, `stock`, `state`, `deleted`) VALUES
+(1, 5, 'Crema', 'M', 10, 'active', 0),
+(2, 5, 'Blanco', 'S', 2, 'active', 0);
 
 -- --------------------------------------------------------
 
@@ -157,6 +202,13 @@ ALTER TABLE `Product_Images`
   ADD KEY `product_id` (`product_id`);
 
 --
+-- Indices de la tabla `Product_Variants`
+--
+ALTER TABLE `Product_Variants`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `product_id` (`product_id`);
+
+--
 -- Indices de la tabla `User`
 --
 ALTER TABLE `User`
@@ -171,31 +223,37 @@ ALTER TABLE `User`
 -- AUTO_INCREMENT de la tabla `Category`
 --
 ALTER TABLE `Category`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `Orders`
 --
 ALTER TABLE `Orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `Order_Detail`
 --
 ALTER TABLE `Order_Detail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `Product`
 --
 ALTER TABLE `Product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `Product_Images`
 --
 ALTER TABLE `Product_Images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `Product_Variants`
+--
+ALTER TABLE `Product_Variants`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `User`
@@ -225,6 +283,12 @@ ALTER TABLE `Product`
 --
 ALTER TABLE `Product_Images`
   ADD CONSTRAINT `product_images_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `Product` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `Product_Variants`
+--
+ALTER TABLE `Product_Variants`
+  ADD CONSTRAINT `product_variants_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `Product` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

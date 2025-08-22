@@ -2,7 +2,6 @@
 
 use Src\Utils\ControllerUtils;
 use Src\Service\Product\ProductCreatorService;
-use Src\Entity\Product\ProductState;
 
 final readonly class ProductPostController {
     private ProductCreatorService $service;
@@ -11,22 +10,17 @@ final readonly class ProductPostController {
         $this->service = new ProductCreatorService();
     }
 
-    public function start(): void
-    {
+    public function start(): void {
         $name = ControllerUtils::getPost("name");
         $description = ControllerUtils::getPost("description");
-        $price = ControllerUtils::getPost("price");
-        $stock = ControllerUtils::getPost("stock");
-        $stateString = ControllerUtils::getPost("state");
-        $state = ProductState::tryFrom($stateString);
+        $price = (float) ControllerUtils::getPost("price");
+        $categoryId = (int) ControllerUtils::getPost("categoryId");
+        $variants = ControllerUtils::getPost("variants") ?? [];
+        $images = ControllerUtils::getPost("images") ?? [];
 
-        if (!$state) {
-            throw new InvalidArgumentException("Estado invalido de producto: $stateString");
-        }
-        $creationDate = new \DateTime();
-        $categoryId = ControllerUtils::getPost("categoryId");
-        $imageUrl = ControllerUtils::getPost("imageUrl");
+        $createdAt = new DateTime();
+        $updatedAt = new DateTime();
 
-        $this->service->create($name, $description, $price, $stock, $state, $creationDate, $categoryId, $imageUrl);
+        $this->service->create($name, $description, $price, $categoryId, $createdAt, $updatedAt, $variants, $images);
     }
 }

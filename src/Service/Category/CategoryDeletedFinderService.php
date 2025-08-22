@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Src\Service\Category;
 
@@ -14,14 +14,14 @@ final readonly class CategoryDeletedFinderService {
         $this->repository = new CategoryRepository();
     }
 
-    public function find(int $id): Category 
-    {   
-        $Category = $this->repository->findDeleted($id);
+    public function find(int $id): Category
+    {
+        $category = $this->repository->findDeleted($id);
 
-        if ($Category === null) {
-            throw new CategoryNotFoundException($id, "No existe ningun autor eliminado con ese Id.");
+        if ($category === null) {
+            throw new CategoryNotFoundException($id, "No existe ninguna categoria eliminada con ese Id.");
         }
 
-        return $Category;
+        return $category;
     }
 }
