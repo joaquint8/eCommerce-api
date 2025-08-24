@@ -18,6 +18,13 @@ services:
     volumes:
       - ./:/var/www/html:rw
       - ./data/apache/logs:/var/log/apache2
+      - ./uploads:/var/www/html/public/uploads:rw 
+    command: > 
+      sh -c "
+        chown -R www-data:www-data /var/www/html/public/uploads &&
+        chmod -R 755 /var/www/html/public/uploads &&
+        docker-php-entrypoint apache2-foreground
+      "
 
   mysql:
     image: mysql:5
