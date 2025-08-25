@@ -63,7 +63,7 @@ class MercadoPagoProvider {
             ],
             "statement_descriptor" => "NAME_DISPLAYED_IN_USER_BILLING", // Texto que aparece en el resumen de tarjeta
             "external_reference" => $externalReference, // Referencia única para rastrear la orden
-            "notification_url" => "https://e2d8bfc4f513.ngrok-free.app/payment/webhook", // Webhook para recibir notificaciones
+            "notification_url" => "https://6144cc4ab577.ngrok-free.app/payment/webhook", // Webhook para recibir notificaciones
             "metadata" => [                       // Datos adicionales para trazabilidad
                 "user_id" => $userId,
                 "order_id" => $orderId
