@@ -20,7 +20,7 @@ final class OrderDetail {
 
     public static function create(int $order_id,int $product_id, int $quantity,float $unit_price,float $total_price, DateTime $created_at,DateTime $updated_at): self
     {
-        return new self(null, $order_id, $product_id,$quantity, $unit_price,$total_price,$created_at,$updated_at);
+        return new self(null, $order_id, $product_id, $quantity, $unit_price, $total_price, $created_at, $updated_at);
     }
 
     
@@ -38,7 +38,6 @@ final class OrderDetail {
     {
         return $this->product_id;
     }
-
     public function quantity(): int
     {
         return $this->quantity;

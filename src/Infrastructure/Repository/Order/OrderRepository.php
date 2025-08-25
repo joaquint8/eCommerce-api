@@ -87,7 +87,15 @@ final readonly class OrderRepository extends PDOManager implements OrderReposito
 
         $this->execute($sql, $params);
 
-        return (int)$this->lastInsertId();
+        // Obtenemos el ID autogenerado por la base de datos
+        $orderId = (int) $this->lastInsertId();
+
+        // Insertamos cada ítem de la orden en la tabla Order_Detail
+        foreach ($order->items() as $item) {
+            $this->insertDetail($orderId, $item);
+        }
+
+        return $orderId;
     }
 
 
@@ -213,7 +221,7 @@ final readonly class OrderRepository extends PDOManager implements OrderReposito
             $orderItems[] = new OrderItem(
                 $product->id(),
                 (int) $item["quantity"],
-                (float) $item["unit_price"],
+                (float) $item["unit_price"]
             );
         }
 
