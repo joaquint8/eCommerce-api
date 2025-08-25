@@ -212,8 +212,8 @@ final readonly class OrderRepository extends PDOManager implements OrderReposito
             // Creamos el objeto OrderItem con los datos del producto
             $orderItems[] = new OrderItem(
                 $product->id(),
+                (int) $item["quantity"],
                 (float) $item["unit_price"],
-                (int) $item["quantity"]
             );
         }
 
